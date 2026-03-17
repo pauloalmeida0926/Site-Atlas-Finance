@@ -36,30 +36,19 @@ function isStrongPassword(password) {
   return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password);
 }
 
-function generateCode() {
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
-
-function saveLoginCode(email) {
-  const code = generateCode();
-  localStorage.setItem(`atlas_login_code_${email}`, code);
-  localStorage.setItem(`atlas_login_code_ts_${email}`, String(Date.now()));
-  codeHint.textContent = `Codigo enviado (simulado): ${code}`;
+async function sendLoginCode(email) {
+  const response = await fetch("/api/send-code", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const err = data && data.error ? data.error : "send_failed";
+    throw new Error(err);
+  }
+  codeHint.textContent = "Codigo enviado para o email.";
   codeWrap.style.display = "grid";
-}
-
-function isCodeValid(email, input) {
-  const stored = localStorage.getItem(`atlas_login_code_${email}`) || "";
-  const ts = Number(localStorage.getItem(`atlas_login_code_ts_${email}`) || "0");
-  const expired = ts && (Date.now() - ts) > (10 * 60 * 1000);
-  if (expired) return { ok: false, msg: "Codigo expirado. Reenvie." };
-  if (!stored || stored !== input) return { ok: false, msg: "Codigo invalido." };
-  return { ok: true, msg: "" };
-}
-
-function clearLoginCode(email) {
-  localStorage.removeItem(`atlas_login_code_${email}`);
-  localStorage.removeItem(`atlas_login_code_ts_${email}`);
 }
 
 function showForm(view) {
@@ -141,12 +130,20 @@ loginForm.addEventListener("submit", (event) => {
     return;
   }
   signInWithEmailAndPassword(auth, email, password)
-    .then((cred) => {
+    .then(async (cred) => {
       setUserState(cred.user);
       pendingLoginEmail = email;
-      loginMsg.textContent = "Codigo de verificacao enviado. Digite para entrar.";
-      loginMsg.className = "success";
-      saveLoginCode(email);
+      try {
+        await sendLoginCode(email);
+        loginMsg.textContent = "Codigo de verificacao enviado. Digite para entrar.";
+        loginMsg.className = "success";
+      } catch (err) {
+        const msg = err && err.message === "resend_key_missing"
+          ? "Chave do Resend nao configurada."
+          : "Nao foi possivel enviar o codigo.";
+        loginMsg.textContent = msg;
+        loginMsg.className = "error";
+      }
     })
     .catch(() => {
       loginMsg.textContent = "Email ou senha invalidos.";
@@ -188,7 +185,7 @@ resetForm.addEventListener("submit", (event) => {
     });
 });
 
-codeVerify.addEventListener("click", () => {
+codeVerify.addEventListener("click", async () => {
   const email = pendingLoginEmail;
   const code = loginCodeInput.value.trim();
   if (!email) {
@@ -201,28 +198,46 @@ codeVerify.addEventListener("click", () => {
     loginMsg.className = "error";
     return;
   }
-  const check = isCodeValid(email, code);
-  if (!check.ok) {
-    loginMsg.textContent = check.msg;
+  try {
+    const response = await fetch("/api/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const err = data && data.error ? data.error : "invalid_code";
+      loginMsg.textContent = err === "invalid_code" ? "Codigo invalido." : "Nao foi possivel validar.";
+      loginMsg.className = "error";
+      return;
+    }
+    loginMsg.textContent = "Login ok. Redirecionando...";
+    loginMsg.className = "success";
+    setTimeout(() => goToApp(email), 300);
+  } catch {
+    loginMsg.textContent = "Falha ao validar codigo.";
     loginMsg.className = "error";
-    return;
   }
-  clearLoginCode(email);
-  loginMsg.textContent = "Login ok. Redirecionando...";
-  loginMsg.className = "success";
-  setTimeout(() => goToApp(email), 300);
 });
 
-codeResend.addEventListener("click", () => {
+codeResend.addEventListener("click", async () => {
   const email = pendingLoginEmail;
   if (!email) {
     loginMsg.textContent = "Inicie o login para reenviar o codigo.";
     loginMsg.className = "error";
     return;
   }
-  saveLoginCode(email);
-  loginMsg.textContent = "Novo codigo enviado.";
-  loginMsg.className = "success";
+  try {
+    await sendLoginCode(email);
+    loginMsg.textContent = "Novo codigo enviado.";
+    loginMsg.className = "success";
+  } catch (err) {
+    const msg = err && err.message === "resend_key_missing"
+      ? "Chave do Resend nao configurada."
+      : "Nao foi possivel reenviar.";
+    loginMsg.textContent = msg;
+    loginMsg.className = "error";
+  }
 });
 
 document.addEventListener("click", (event) => {

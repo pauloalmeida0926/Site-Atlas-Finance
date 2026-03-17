@@ -715,13 +715,10 @@
         </div>
     </div>
 
-    <script>
-        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
-        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
-            localStorage.removeItem("atlas_logged");
-            localStorage.removeItem("atlas_session_expires");
-            window.location.href = "login.html";
-        }
+    <script type="module">
+        import { requireAuth, signOutUser, auth } from "./auth.js";
+        import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        requireAuth();
 
         const STORAGE = {
             capital: "atlas_capital",
@@ -1452,8 +1449,7 @@
         });
 
         logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("atlas_logged");
-            window.location.href = "login.html";
+            signOutUser();
         });
 
         function getUsers() {
@@ -1522,7 +1518,8 @@
                 localStorage.setItem("atlas_current_user", email);
             }
             const user = users.find((u) => u.email === email);
-            const displayName = user ? user.name : "Perfil";
+            const cachedName = localStorage.getItem("atlas_current_name") || "";
+            const displayName = user ? user.name : (cachedName || "Perfil");
             const initials = initialsFromName(displayName, email);
             const avatarKey = getAvatarKey(email);
             const savedAvatar = localStorage.getItem(avatarKey);
@@ -1617,11 +1614,10 @@
             localStorage.setItem(getSuggestionKey(email), suggestions.value.trim());
         });
 
-        savePass.addEventListener("click", () => {
-            const email = getCurrentEmail();
+        savePass.addEventListener("click", async () => {
             const current = currentPass.value.trim();
             const next = newPass.value.trim();
-            if (!email || !current || !next) {
+            if (!current || !next) {
                 passMsg.textContent = "Preencha senha atual e nova senha.";
                 return;
             }
@@ -1629,17 +1625,21 @@
                 passMsg.textContent = "Senha fraca. Use 8+ caracteres, maiuscula, minuscula e numero.";
                 return;
             }
-            const users = getUsers();
-            const idx = users.findIndex((u) => u.email === email);
-            if (idx === -1 || users[idx].password !== current) {
-                passMsg.textContent = "Senha atual incorreta.";
+            const user = auth.currentUser;
+            if (!user || !user.email) {
+                passMsg.textContent = "Sessao expirada. Faca login novamente.";
                 return;
             }
-            users[idx].password = next;
-            saveUsers(users);
-            currentPass.value = "";
-            newPass.value = "";
-            passMsg.textContent = "Senha atualizada.";
+            try {
+                const credential = EmailAuthProvider.credential(user.email, current);
+                await reauthenticateWithCredential(user, credential);
+                await updatePassword(user, next);
+                currentPass.value = "";
+                newPass.value = "";
+                passMsg.textContent = "Senha atualizada.";
+            } catch (err) {
+                passMsg.textContent = "Nao foi possivel atualizar. Verifique a senha atual.";
+            }
         });
 
 
