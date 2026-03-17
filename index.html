@@ -823,6 +823,8 @@
         const supportToggle = document.getElementById("support-toggle");
         const supportModal = document.getElementById("support-modal");
         const closeSupportModal = document.getElementById("close-support-modal");
+        const switchAccount = document.getElementById("switch-account");
+        const deleteAccount = document.getElementById("delete-account");
         const b3Board = document.getElementById("b3-board");
         const eduOutput = document.getElementById("edu-output");
 
@@ -1454,6 +1456,32 @@
         });
 
         logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
+        });
+
+        switchAccount.addEventListener("click", () => {
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
+        });
+
+        deleteAccount.addEventListener("click", () => {
+            const email = getCurrentEmail();
+            if (!email) {
+                localStorage.removeItem("atlas_logged");
+                window.location.href = "login.html";
+                return;
+            }
+            const ok = window.confirm("Deseja excluir esta conta? Esta acao nao pode ser desfeita.");
+            if (!ok) return;
+            const users = getUsers();
+            const nextUsers = users.filter((u) => u.email !== email);
+            saveUsers(nextUsers);
+            localStorage.removeItem(`atlas_api_token_${email}`);
+            localStorage.removeItem(`atlas_avatar_${email}`);
+            localStorage.removeItem(`atlas_avatar_color_${email}`);
+            localStorage.removeItem(`atlas_suggestions_${email}`);
+            localStorage.removeItem("atlas_current_user");
             localStorage.removeItem("atlas_logged");
             window.location.href = "login.html";
         });
