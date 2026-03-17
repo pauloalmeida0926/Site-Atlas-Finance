@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atlas Finance - Controle Corporativo</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap");
+
+        :root {
+            --bg: #eef3ff;
+            --card: rgba(255, 255, 255, 0.92);
+            --ink: #0f1a2b;
+            --muted: #516079;
+            --accent: #2563eb;
+            --accent-2: #ef4444;
+            --danger: #dc2626;
+            --shadow: 0 18px 50px rgba(9, 26, 59, 0.18);
+            --radius: 16px;
+            --border: #dbe4ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.18) 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, rgba(239, 68, 68, 0.16) 0%, transparent 55%),
+                var(--bg);
+        }
+
+        header {
+            padding: 40px 20px 10px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logout-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3.6rem);
+            margin: 0 0 10px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-family: "Playfair Display", serif;
+            font-size: 1.05rem;
+            margin: 0;
+            max-width: 720px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto 80px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .section {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 22px;
+            border: 1px solid rgba(219, 228, 255, 0.7);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 1.3rem;
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.12);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            background: #eef4ff;
+            border-left: 4px solid var(--accent);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #27406e;
+        }
+
+        form { display: grid; gap: 10px; }
+
+        label { font-size: 0.85rem; color: var(--muted); }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 0.95rem;
+        }
+
+        button {
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+        }
+
+        .summary-item {
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .row small { color: var(--muted); }
+        .row button { background: var(--danger); }
+        .row button,
+        .row .cta-link {
+            color: #fff;
+        }
+
+        .chart {
+            display: grid;
+            gap: 8px;
+        }
+
+        .bar {
+            height: 10px;
+            background: #efe6d7;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .bar span {
+            display: block;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 999px;
+        }
+
+        .advice {
+            display: grid;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-2);
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .details {
+            display: grid;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.14);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .details-panel {
+            border: 1px solid #efe6d7;
+            border-radius: 12px;
+            background: #fff;
+            padding: 12px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+        }
+
+        .modal {
+            width: min(520px, calc(100% - 40px));
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .cta-link {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid #e3d6c6;
+        }
+
+        .profile-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            background: linear-gradient(135deg, #2563eb, #ef4444);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 18px rgba(37, 99, 235, 0.25);
+        }
+        .profile-btn img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+        .profile-btn.has-photo {
+            padding: 0;
+            border: none;
+        }
+
+        .profile-panel {
+            position: fixed;
+            right: 20px;
+            top: 78px;
+            width: min(360px, calc(100% - 40px));
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 16px;
+            display: none;
+            z-index: 25;
+            max-height: 80vh;
+            overflow: auto;
+            animation: fadeUp 0.2s ease;
+        }
+
+        .profile-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+        }
+
+        .profile-section {
+            border-top: 1px solid var(--border);
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+
+        .support-toggle {
+            background: #f3f6ff;
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--accent);
+            width: 100%;
+            text-align: left;
+        }
+
+        .support-list {
+            display: none;
+        }
+
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 700px) {
+            header { padding-top: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-actions">
+            <div>
+                <div class="pill">Painel corporativo</div>
+                <h1>Atlas Finance</h1>
+                <p class="subtitle">Controle capital, receitas e despesas ao longo do tempo. Simulador educativo de investimentos com dados ficticios da B3.</p>
+            </div>
+            <button id="profile-btn" class="profile-btn" type="button" aria-label="Perfil">P</button>
+        </div>
+        <p class="disclaimer">Aviso: informacoes educativas gerais, com dados simulados. Nao e recomendacao de investimento.</p>
+    </header>
+
+    <main class="container">
+        <section class="section">
+            <div class="section-header">
+                <h2>Capital e Fluxo</h2>
+                <span class="muted">Visao geral do caixa</span>
+            </div>
+            <div class="card" style="margin-bottom:12px;">
+                <h3 style="margin:0 0 10px;">Configurar capital</h3>
+                <form id="capital-form">
+                <div>
+                    <label for="company">Empresa</label>
+                    <input id="company" name="company" placeholder="Ex.: Orion Tech" required />
+                </div>
+                <div>
+                    <label for="capital">Capital inicial (R$)</label>
+                    <input id="capital" name="capital" type="text" inputmode="decimal" placeholder="Ex.: 10000,00" required />
+                </div>
+                <button type="submit">Salvar capital</button>
+                </form>
+            </div>
+            <div class="card" style="margin-bottom:12px;">
+                <h3 style="margin:0 0 10px;">Registrar movimentacao</h3>
+                <form id="cashflow-form">
+                <div>
+                    <label for="flow-desc">Descricao</label>
+                    <input id="flow-desc" name="flow-desc" placeholder="Ex.: Receita de contratos" required />
+                </div>
+                <div>
+                    <label for="flow-type">Tipo</label>
+                    <select id="flow-type" name="flow-type" required>
+                        <option value="receita">Receita</option>
+                        <option value="despesa">Despesa</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="flow-amount">Valor (R$)</label>
+                    <input id="flow-amount" name="flow-amount" type="text" inputmode="decimal" placeholder="Ex.: 2500,50" required />
+                </div>
+                <div>
+                    <label for="flow-date">Data</label>
+                    <input id="flow-date" name="flow-date" type="date" required />
+                </div>
+                <button type="submit">Adicionar</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3 style="margin:0 0 10px;">Resumo financeiro</h3>
+            <div class="summary">
+                <div class="summary-item">
+                    <span>Empresa</span>
+                    <strong id="company-name">-</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Capital atual</span>
+                    <strong id="capital-current">R$ 0,00</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Investimentos (reais)</span>
+                    <strong id="total-invested-real">R$ 0,00</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Rendimento atual</span>
+                    <strong id="total-yield">R$ 0,00</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Receitas</span>
+                    <strong id="total-revenue">R$ 0,00</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Despesas</span>
+                    <strong id="total-expense">R$ 0,00</strong>
+                </div>
+            </div>
+            <div style="margin-top:14px;">
+                <h3 style="margin:0 0 8px; font-size:1rem;">Fluxo por mes</h3>
+                <div id="monthly-chart" class="chart"></div>
+            </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Movimentacoes</h2>
+                <span class="muted">Receitas, despesas e investimentos reais</span>
+            </div>
+            <div class="card">
+                <div id="flow-list" class="list"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Investimentos</h2>
+                <span class="muted">Reais, simulacao e projecao</span>
+            </div>
+            <div class="summary" style="grid-template-columns: repeat(3, minmax(90px, 1fr)); margin-bottom: 12px;">
+                <button id="tab-real" type="button" style="padding:10px 12px; border-radius:10px;">Reais</button>
+                <button id="tab-sim" type="button" style="padding:10px 12px; border-radius:10px;">Simulacao</button>
+                <a href="projecao.html" class="cta-link" style="text-align:center; display:inline-flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:10px; font-weight:600; background:var(--accent); color:#fff; border:none;">Projecao</a>
+            </div>
+            <div class="summary" style="grid-template-columns: repeat(2, minmax(90px, 1fr)); margin-bottom: 12px;">
+                <a href="comparacao.html" class="cta-link" style="text-align:center; display:inline-flex; align-items:center; justify-content:center; padding:10px 12px; border-radius:10px; font-weight:600; background:var(--accent); color:#fff; border:none;">Tabela historica</a>
+                <div class="muted" id="real-updated" style="display:flex; align-items:center; justify-content:center;">Ultima atualizacao: -</div>
+            </div>
+
+            <div id="panel-real" class="card">
+                <form id="token-form" style="margin-bottom:10px;">
+                    <div>
+                        <label for="api-token">Token da API (brapi.dev)</label>
+                        <input id="api-token" name="api-token" type="text" placeholder="Cole o token aqui" />
+                    </div>
+                    <button type="submit">Salvar token</button>
+                </form>
+                <form id="real-invest-form">
+                    <div>
+                        <label for="real-ticker">Ticker</label>
+                        <input id="real-ticker" name="real-ticker" type="text" placeholder="Ex.: MXRF11" required />
+                    </div>
+                    <div>
+                        <label for="real-shares">Quantidade de cotas</label>
+                        <input id="real-shares" name="real-shares" type="number" step="1" min="1" required />
+                    </div>
+                    <div>
+                        <label for="real-date">Data</label>
+                        <input id="real-date" name="real-date" type="date" required />
+                    </div>
+                    <div>
+                        <label for="real-goal">Objetivo</label>
+                        <select id="real-goal" name="real-goal" required>
+                            <option value="caixa">Reserva de caixa</option>
+                            <option value="crescimento">Crescimento</option>
+                            <option value="dividendos">Dividendos</option>
+                        </select>
+                    </div>
+                    <button type="submit">Adicionar investimento real</button>
+                </form>
+                <div style="margin-top:10px;">
+                    <button id="refresh-real" type="button">Atualizar cotacoes</button>
+                    <small id="real-status" style="color:var(--muted); margin-left:8px;"></small>
+                </div>
+                <div id="real-invest-list" class="list" style="margin-top:12px;"></div>
+            </div>
+
+            <div id="panel-sim" class="card" style="display:none;">
+                <form id="invest-form">
+                <div>
+                    <label for="asset-class">Classe</label>
+                    <select id="asset-class" name="asset-class" required>
+                        <option value="acoes">Acoes</option>
+                        <option value="fiis">Fundos Imobiliarios</option>
+                        <option value="renda_fixa">Renda Fixa (simulado)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="ticker">Ticker</label>
+                    <select id="ticker" name="ticker" required></select>
+                </div>
+                <div>
+                    <label for="shares">Quantidade de cotas</label>
+                    <input id="shares" name="shares" type="number" step="1" min="1" required />
+                </div>
+                <div>
+                    <label for="avg-price">Preco medio (R$)</label>
+                    <input id="avg-price" name="avg-price" type="text" inputmode="decimal" placeholder="Ex.: 9,58" required />
+                </div>
+                <div>
+                    <label for="invest-date">Data</label>
+                    <input id="invest-date" name="invest-date" type="date" required />
+                </div>
+                <div>
+                    <label for="goal">Objetivo</label>
+                    <select id="goal" name="goal" required>
+                        <option value="caixa">Reserva de caixa</option>
+                        <option value="crescimento">Crescimento</option>
+                        <option value="dividendos">Dividendos</option>
+                    </select>
+                </div>
+                <button type="submit">Adicionar investimento</button>
+                </form>
+                <div id="invest-list" class="list" style="margin-top:12px;"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Mercado e Educacao</h2>
+                <span class="muted">Referencias educativas</span>
+            </div>
+            <div class="card" style="margin-bottom:12px;">
+                <h3 style="margin:0 0 10px;">Painel da B3 (simulado)</h3>
+                <div id="b3-board" class="chart"></div>
+                <div class="advice" style="margin-top:12px;">
+                    <div>Dados ficticios para aprendizado. Use APIs reais quando estiver pronto.</div>
+                    <div>Projecao e baseada em faixas educativas, nao em previsao real de mercado.</div>
+                </div>
+            </div>
+            <div class="card" style="margin-bottom:12px;">
+                <h3 style="margin:0 0 10px;">Guia educativo</h3>
+                <div id="edu-output" class="advice"></div>
+            </div>
+            <div class="card">
+                <h3 style="margin:0 0 10px;">Melhores investimentos (educativo)</h3>
+                <div class="muted">Conteudo educativo e generico. Nao e recomendacao de investimento.</div>
+                <div id="best-list" class="list" style="margin-top:12px;"></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="profile-panel" class="profile-panel" aria-live="polite">
+        <div class="profile-header">
+            <div>
+                <div class="muted" id="profile-email">usuario@email.com</div>
+                <strong id="profile-name">Perfil</strong>
+            </div>
+            <button id="close-profile" class="logout-btn" type="button">X</button>
+        </div>
+        <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+            <img id="profile-avatar" class="profile-avatar" src="" alt="Foto do perfil" />
+            <div>
+                <label class="muted">Foto</label>
+                <input id="profile-photo" type="file" accept="image/*" />
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <strong>Token salvo</strong>
+            <div id="token-status" class="muted" style="margin-top:6px;"></div>
+            <button id="clear-token" class="cta-link" type="button" style="margin-top:6px;">Limpar token</button>
+        </div>
+
+        <div class="profile-section">
+            <button id="toggle-pass" class="support-toggle" type="button">Alterar senha</button>
+            <div id="pass-panel" style="display:none; margin-top:10px;">
+                <div>
+                    <input id="current-pass" type="password" placeholder="Senha atual" />
+                </div>
+                <div style="margin-top:8px;">
+                    <input id="new-pass" type="password" placeholder="Nova senha" />
+                </div>
+                <button id="save-pass" class="cta-link" type="button" style="margin-top:8px;">Salvar senha</button>
+                <div id="pass-msg" class="muted"></div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <strong>Sugestoes</strong>
+            <textarea id="suggestions" rows="3" style="width:100%; margin-top:8px; border:1px solid var(--border); border-radius:10px; padding:8px;"></textarea>
+            <button id="save-suggestions" class="cta-link" type="button" style="margin-top:6px;">Salvar sugestoes</button>
+        </div>
+
+        <div class="profile-section">
+            <button id="support-toggle" class="support-toggle" type="button">Suporte</button>
+        </div>
+
+        <div class="profile-section">
+            <button id="logout-btn" class="logout-btn" type="button">Sair</button>
+        </div>
+    </div>
+
+    <div id="best-modal" class="modal-overlay" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true">
+            <button id="close-best-modal" class="modal-close" aria-label="Fechar">x</button>
+            <div id="best-details" class="details-panel"></div>
+        </div>
+    </div>
+
+    <div id="support-modal" class="modal-overlay" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true">
+            <button id="close-support-modal" class="modal-close" aria-label="Fechar">x</button>
+            <div class="details-panel">
+                <h3 style="margin:0 0 8px;">Suporte</h3>
+                <div class="muted" style="margin-bottom:10px;">Escolha um canal para falar com a equipe.</div>
+                <div class="list">
+                    <div class="row">
+                        <div>
+                            <strong>Chat com bot</strong><br/>
+                            <small>Respostas rápidas e passo a passo.</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <a href="support.html" class="cta-link">Abrir</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <strong>WhatsApp</strong><br/>
+                            <small>+55 32 99937-0796</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <a href="https://wa.me/5532999370796" target="_blank" rel="noreferrer" class="cta-link">Chamar</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <strong>Email</strong><br/>
+                            <small>pauloalmeidappp750@gmail.com</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <a href="mailto:pauloalmeidappp750@gmail.com" class="cta-link">Enviar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
+        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+            localStorage.removeItem("atlas_logged");
+            localStorage.removeItem("atlas_session_expires");
+            window.location.href = "login.html";
+        }
+
+        const STORAGE = {
+            capital: "atlas_capital",
+            flows: "atlas_flows",
+            investments: "atlas_investments",
+            realInvestments: "atlas_real_investments",
+            apiToken: "atlas_api_token"
+        };
+
+        function currentUserKey() {
+            const email = localStorage.getItem("atlas_current_user") || "default";
+            return `${STORAGE.apiToken}_${email}`;
+        }
+
+        function maskToken(token) {
+            if (!token) return "Nenhum token salvo.";
+            if (token.length <= 6) return token;
+            return `${token.slice(0, 3)}***${token.slice(-3)}`;
+        }
+
+        function isStrongPassword(password) {
+            return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password);
+        }
+
+        const b3Simulated = {
+            PETR4: { price: 36.40, change: 1.4, range: [30.0, 42.0], sector: "Energia", class: "acoes" },
+            VALE3: { price: 63.10, change: -0.8, range: [56.0, 70.0], sector: "Mineracao", class: "acoes" },
+            ITUB4: { price: 30.25, change: 0.4, range: [26.0, 34.0], sector: "Bancos", class: "acoes" },
+            BBDC4: { price: 16.90, change: 0.2, range: [14.5, 19.0], sector: "Bancos", class: "acoes" },
+            WEGE3: { price: 39.80, change: 2.1, range: [32.0, 45.0], sector: "Industria", class: "acoes" },
+            BBAS3: { price: 53.70, change: -1.1, range: [47.0, 60.0], sector: "Bancos", class: "acoes" },
+            GOAU3: { price: 11.40, change: 0.6, range: [9.5, 13.5], sector: "Metalurgia", class: "acoes" },
+            ABEV3: { price: 14.20, change: -0.3, range: [12.0, 16.5], sector: "Consumo", class: "acoes" },
+            B3SA3: { price: 12.10, change: 0.9, range: [9.8, 14.0], sector: "Financeiro", class: "acoes" },
+            EGIE3: { price: 38.60, change: 1.0, range: [33.0, 42.0], sector: "Energia", class: "acoes" },
+            MXRF11: { price: 10.40, change: 0.2, range: [9.2, 12.0], sector: "FIIs", class: "fiis" },
+            HGLG11: { price: 160.20, change: -0.5, range: [140.0, 175.0], sector: "Logistica", class: "fiis" },
+            KNRI11: { price: 154.80, change: 0.1, range: [130.0, 170.0], sector: "Tijolo", class: "fiis" },
+            XPLG11: { price: 108.30, change: 0.7, range: [95.0, 120.0], sector: "Logistica", class: "fiis" },
+            VISC11: { price: 104.50, change: -0.4, range: [90.0, 115.0], sector: "Shoppings", class: "fiis" },
+            BCFF11: { price: 62.90, change: 0.2, range: [55.0, 70.0], sector: "Fundos", class: "fiis" },
+            CDB1: { price: 1.0, change: 0.0, range: [0.97, 1.03], sector: "Pos-fixado", class: "renda_fixa" },
+            LCI1: { price: 1.0, change: 0.0, range: [0.96, 1.04], sector: "Isento", class: "renda_fixa" },
+            TESOURO_IPCA: { price: 1.0, change: 0.0, range: [0.95, 1.05], sector: "Inflacao", class: "renda_fixa" }
+        };
+
+        const capitalForm = document.getElementById("capital-form");
+        const cashflowForm = document.getElementById("cashflow-form");
+        const flowList = document.getElementById("flow-list");
+        const monthlyChart = document.getElementById("monthly-chart");
+        const companyName = document.getElementById("company-name");
+        const capitalCurrent = document.getElementById("capital-current");
+        const totalRevenue = document.getElementById("total-revenue");
+        const totalExpense = document.getElementById("total-expense");
+        const totalInvestedReal = document.getElementById("total-invested-real");
+        const totalYield = document.getElementById("total-yield");
+        const flowDate = document.getElementById("flow-date");
+        const investDate = document.getElementById("invest-date");
+
+        const investForm = document.getElementById("invest-form");
+        const assetClassSelect = document.getElementById("asset-class");
+        const tickerSelect = document.getElementById("ticker");
+        const investList = document.getElementById("invest-list");
+        const realInvestForm = document.getElementById("real-invest-form");
+        const realInvestList = document.getElementById("real-invest-list");
+        const realDate = document.getElementById("real-date");
+        const realStatus = document.getElementById("real-status");
+        const refreshReal = document.getElementById("refresh-real");
+        const apiTokenInput = document.getElementById("api-token");
+        const tokenForm = document.getElementById("token-form");
+        const tabReal = document.getElementById("tab-real");
+        const tabSim = document.getElementById("tab-sim");
+        const panelReal = document.getElementById("panel-real");
+        const panelSim = document.getElementById("panel-sim");
+        const bestList = document.getElementById("best-list");
+        const bestDetails = document.getElementById("best-details");
+        const bestModal = document.getElementById("best-modal");
+        const closeBestModal = document.getElementById("close-best-modal");
+        const logoutBtn = document.getElementById("logout-btn");
+        const profileBtn = document.getElementById("profile-btn");
+        const profilePanel = document.getElementById("profile-panel");
+        const closeProfile = document.getElementById("close-profile");
+        const profileEmail = document.getElementById("profile-email");
+        const profileName = document.getElementById("profile-name");
+        const profileAvatar = document.getElementById("profile-avatar");
+        const profilePhoto = document.getElementById("profile-photo");
+        const tokenStatus = document.getElementById("token-status");
+        const clearToken = document.getElementById("clear-token");
+        const currentPass = document.getElementById("current-pass");
+        const newPass = document.getElementById("new-pass");
+        const savePass = document.getElementById("save-pass");
+        const passMsg = document.getElementById("pass-msg");
+        const togglePass = document.getElementById("toggle-pass");
+        const passPanel = document.getElementById("pass-panel");
+        const suggestions = document.getElementById("suggestions");
+        const saveSuggestions = document.getElementById("save-suggestions");
+        const supportToggle = document.getElementById("support-toggle");
+        const supportModal = document.getElementById("support-modal");
+        const closeSupportModal = document.getElementById("close-support-modal");
+        const b3Board = document.getElementById("b3-board");
+        const eduOutput = document.getElementById("edu-output");
+
+        function toBRL(value) {
+            const safe = Number.isFinite(value) ? value : 0;
+            return safe.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        }
+
+        function parseMoney(raw) {
+            const normalized = String(raw).replace(/\./g, "").replace(",", ".");
+            const value = Number(normalized);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function load(key, fallback) {
+            const saved = localStorage.getItem(key);
+            return saved ? JSON.parse(saved) : fallback;
+        }
+
+        function save(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function setDefaultDate() {
+            const today = new Date();
+            flowDate.value = today.toISOString().split("T")[0];
+            if (investDate) {
+                investDate.value = today.toISOString().split("T")[0];
+            }
+            if (realDate) {
+                realDate.value = today.toISOString().split("T")[0];
+            }
+        }
+
+        function renderCapital() {
+            const capitalData = load(STORAGE.capital, { company: "-", value: 0 });
+            companyName.textContent = capitalData.company || "-";
+            capitalCurrent.textContent = toBRL(capitalData.value || 0);
+        }
+
+        function renderFlows() {
+            const flows = load(STORAGE.flows, []);
+            const realInvestments = load(STORAGE.realInvestments, []);
+            flowList.innerHTML = "";
+            if (flows.length === 0 && realInvestments.length === 0) {
+                flowList.innerHTML = "<div class='row'>Nenhuma movimentacao registrada.</div>";
+            }
+
+            let revenue = 0;
+            let expense = 0;
+            const byMonth = {};
+
+            const combined = [];
+
+            flows.forEach((item, index) => {
+                if (item.type === "receita") revenue += item.amount;
+                if (item.type === "despesa") expense += item.amount;
+
+                const month = item.date.slice(0, 7);
+                byMonth[month] = byMonth[month] || { receita: 0, despesa: 0 };
+                byMonth[month][item.type] += item.amount;
+
+                combined.push({
+                    kind: "flow",
+                    index,
+                    date: item.date,
+                    desc: item.desc,
+                    type: item.type,
+                    amount: item.amount
+                });
+            });
+
+            realInvestments.forEach((item, index) => {
+                const date = item.date || new Date().toISOString().split("T")[0];
+                combined.push({
+                    kind: "real_investment",
+                    index,
+                    date,
+                    desc: `${item.ticker} (${item.goal})`,
+                    type: "investimento real",
+                    amount: item.avgPrice * item.shares
+                });
+            });
+
+            combined
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .forEach((item) => {
+                    const row = document.createElement("div");
+                    row.className = "row";
+                    row.innerHTML = `
+                        <div>
+                            <strong>${item.desc}</strong><br/>
+                            <small>${item.date} • ${item.type}</small>
+                        </div>
+                        <div style="text-align:right;">
+                            <div>${toBRL(item.amount)}</div>
+                            <span class="tag">${item.type}</span>
+                            <button data-kind="${item.kind}" data-index="${item.index}" aria-label="Excluir">Excluir</button>
+                        </div>
+                    `;
+                    flowList.appendChild(row);
+                });
+
+            renderMonthlyChart(byMonth);
+        }
+
+        function updateTotals() {
+            const capitalData = load(STORAGE.capital, { company: "-", value: 0 });
+            const flows = load(STORAGE.flows, []);
+            const realInvestments = load(STORAGE.realInvestments, []);
+
+            let revenue = 0;
+            let expense = 0;
+            flows.forEach((item) => {
+                if (item.type === "receita") revenue += item.amount;
+                if (item.type === "despesa") expense += item.amount;
+            });
+
+            const investedReal = realInvestments.reduce((sum, item) => sum + (item.buyPrice * item.shares), 0);
+            const currentReal = realInvestments.reduce((sum, item) => {
+                const quote = realQuoteCache[item.ticker?.toUpperCase()];
+                const price = quote ? quote.price : item.buyPrice;
+                return sum + (price * item.shares);
+            }, 0);
+            const totalPnL = currentReal - investedReal;
+
+            totalRevenue.textContent = toBRL(revenue);
+            totalExpense.textContent = toBRL(expense);
+            totalInvestedReal.textContent = toBRL(investedReal);
+            totalYield.textContent = toBRL(totalPnL);
+
+            const base = Number.isFinite(capitalData.value) ? capitalData.value : 0;
+            const current = base + revenue - expense - investedReal;
+            capitalCurrent.textContent = toBRL(current);
+            companyName.textContent = capitalData.company || "-";
+        }
+
+        function renderMonthlyChart(byMonth) {
+            monthlyChart.innerHTML = "";
+            const months = Object.keys(byMonth).sort();
+            if (months.length === 0) {
+                monthlyChart.innerHTML = "<small>Sem dados suficientes.</small>";
+                return;
+            }
+            const maxValue = Math.max(...months.map((m) => Math.max(byMonth[m].receita, byMonth[m].despesa)));
+            months.forEach((month) => {
+                const revenue = byMonth[month].receita;
+                const expense = byMonth[month].despesa;
+                const wrapper = document.createElement("div");
+                const revenuePercent = maxValue === 0 ? 0 : (revenue / maxValue) * 100;
+                const expensePercent = maxValue === 0 ? 0 : (expense / maxValue) * 100;
+                wrapper.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                        <span>${month}</span>
+                        <span>R: ${toBRL(revenue)} | D: ${toBRL(expense)}</span>
+                    </div>
+                    <div class="bar"><span style="width:${revenuePercent.toFixed(1)}%"></span></div>
+                    <div class="bar"><span style="width:${expensePercent.toFixed(1)}%; background:#b1322b;"></span></div>
+                `;
+                monthlyChart.appendChild(wrapper);
+            });
+        }
+
+        function renderInvestments() {
+            const investments = load(STORAGE.investments, []);
+            investList.innerHTML = "";
+            if (investments.length === 0) {
+                investList.innerHTML = "<div class='row'>Nenhum investimento registrado.</div>";
+            }
+
+            investments.forEach((item, index) => {
+                const market = b3Simulated[item.ticker];
+                const current = market.price * item.shares;
+                const cost = item.avgPrice * item.shares;
+                const pnl = current - cost;
+                const pnlLabel = pnl >= 0 ? "Lucro" : "Prejuizo";
+                const range = market.range.map((value) => toBRL(value)).join(" - ");
+                const classLabel = item.assetClass === "acoes"
+                    ? "Acoes"
+                    : item.assetClass === "fiis"
+                        ? "FIIs"
+                        : "Renda Fixa";
+                const row = document.createElement("div");
+                row.className = "row";
+                row.innerHTML = `
+                    <div>
+                        <strong>${item.ticker}</strong> <span class="tag">${market.sector}</span><br/>
+                        <small>${classLabel} • ${item.goal} • <button class="cta-link" data-show="invested" data-value="${item.avgPrice * item.shares}" data-shares="${item.shares}" data-state="shares">${item.shares} cotas</button></small>
+                    </div>
+                    <div style="text-align:right;">
+                        <div>Atual: ${toBRL(current)}</div>
+                        <small>${pnlLabel}: ${toBRL(pnl)}</small><br/>
+                        <small>Faixa 12m: ${range}</small>
+                        <button data-index="${index}" aria-label="Excluir">Excluir</button>
+                    </div>
+                `;
+                investList.appendChild(row);
+            });
+
+            renderEduGuide(investments);
+        }
+
+        const realQuoteCache = {};
+
+        async function fetchRealQuotes() {
+            const investments = load(STORAGE.realInvestments, []);
+            if (investments.length === 0) return;
+            const token = load(currentUserKey(), "");
+            if (!token) {
+                realStatus.textContent = "Informe o token para buscar cotacoes.";
+                return;
+            }
+
+            const tickers = [...new Set(investments.map((item) => item.ticker.toUpperCase()))];
+            realStatus.textContent = "Atualizando cotacoes...";
+            try {
+                const response = await fetch(`http://localhost:3000/api/quote?tickers=${tickers.join(",")}&token=${encodeURIComponent(token)}`);
+                const data = await response.json();
+                if (!response.ok) {
+                    const detail = data && (data.message || data.error || data.detail);
+                    realStatus.textContent = detail ? `Erro: ${detail}` : "Erro ao buscar cotacoes.";
+                    return;
+                }
+                if (!data || !data.results) {
+                    realStatus.textContent = "Resposta invalida da API.";
+                    return;
+                }
+                data.results.forEach((item) => {
+                    realQuoteCache[item.symbol.toUpperCase()] = {
+                        price: item.regularMarketPrice,
+                        change: item.regularMarketChangePercent
+                    };
+                });
+                realStatus.textContent = "Cotacoes atualizadas.";
+                const stamp = new Date();
+                const hh = String(stamp.getHours()).padStart(2, "0");
+                const mm = String(stamp.getMinutes()).padStart(2, "0");
+                const updatedEl = document.getElementById("real-updated");
+                if (updatedEl) updatedEl.textContent = `Ultima atualizacao: ${hh}:${mm}`;
+                renderRealInvestments();
+                updateTotals();
+            } catch (err) {
+                realStatus.textContent = `Erro ao buscar cotacoes: ${err && err.message ? err.message : "falha de rede"}`;
+            }
+        }
+
+        // dividendos removidos temporariamente
+
+        function renderRealInvestments() {
+            const investments = load(STORAGE.realInvestments, []);
+            realInvestList.innerHTML = "";
+            if (investments.length === 0) {
+                realInvestList.innerHTML = "<div class='row'>Nenhum investimento real registrado.</div>";
+                return;
+            }
+
+            investments.forEach((item, index) => {
+                const quote = realQuoteCache[item.ticker.toUpperCase()];
+                const price = quote ? quote.price : item.buyPrice;
+                const current = price * item.shares;
+                const cost = item.buyPrice * item.shares;
+                const pnl = current - cost;
+                const pnlLabel = pnl >= 0 ? "Lucro" : "Prejuizo";
+                const calc = `(${toBRL(price)} - ${toBRL(item.buyPrice)}) x ${item.shares}`;
+                const invested = cost;
+                const row = document.createElement("div");
+                row.className = "row";
+                row.innerHTML = `
+                    <div>
+                        <strong>${item.ticker.toUpperCase()}</strong><br/>
+                        <small>${item.date} • ${item.goal} • <button class="cta-link" data-show="invested" data-value="${invested}" data-shares="${item.shares}" data-state="shares">${item.shares} cotas</button></small>
+                        <div class="details">
+                            <span>Preco unitario: ${toBRL(price)}</span>
+                            <span>Calculo do lucro: ${calc}</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div>Atual: ${toBRL(current)}</div>
+                        <small>${pnlLabel}: ${toBRL(pnl)}</small><br/>
+                        <small>Preco de compra: ${toBRL(item.buyPrice)}</small>
+                        <button data-kind="real_investment" data-index="${index}" aria-label="Excluir">Excluir</button>
+                    </div>
+                `;
+                realInvestList.appendChild(row);
+            });
+        }
+
+        const bestInvestments = [
+            {
+                id: "reserva",
+                title: "Reserva de caixa",
+                tags: ["Liquidez", "Baixo risco"],
+                summary: "Foco em liquidez e previsibilidade para manter o caixa da empresa.",
+                picks: ["Tesouro Selic", "CDB pos-fixado", "Fundos DI"],
+                details: [
+                    "O que e: ativos de alta liquidez e volatilidade baixa.",
+                    "Quando faz sentido: empresas que precisam de caixa de curto prazo.",
+                    "Exemplos: CDB pos-fixado, Tesouro Selic, fundos DI."
+                ]
+            },
+            {
+                id: "fiis",
+                title: "Fundos imobiliarios (FIIs)",
+                tags: ["Renda mensal", "Diversificacao"],
+                summary: "Renda recorrente e exposicao ao setor imobiliario via cotas.",
+                picks: ["MXRF11", "HGLG11", "KNRI11", "VISC11"],
+                details: [
+                    "O que e: fundos com carteira de imoveis ou recebiveis.",
+                    "Risco: variacao das cotas e vacancia.",
+                    "Quando faz sentido: horizonte medio/longo com foco em renda."
+                ]
+            },
+            {
+                id: "acoes",
+                title: "Acoes de empresas consolidadas",
+                tags: ["Crescimento", "Risco moderado"],
+                summary: "Participacao em empresas com historico de resultados.",
+                picks: ["VALE3", "ITUB4", "BBAS3", "WEGE3"],
+                details: [
+                    "O que e: compra de participacao em empresas listadas.",
+                    "Risco: volatilidade e ciclos economicos.",
+                    "Quando faz sentido: horizonte longo e fluxo de caixa estavel."
+                ]
+            },
+            {
+                id: "tesouro",
+                title: "Titulos indexados a inflacao",
+                tags: ["Protecao", "Longo prazo"],
+                summary: "Protege o poder de compra no longo prazo.",
+                picks: ["Tesouro IPCA+", "LCI/LCA (isentos)"],
+                details: [
+                    "O que e: titulos publicos que acompanham inflacao.",
+                    "Risco: oscilacao no curto prazo.",
+                    "Quando faz sentido: metas de longo prazo."
+                ]
+            }
+        ];
+
+        function renderBestInvestments() {
+            bestList.innerHTML = "";
+            bestInvestments.forEach((item) => {
+                const row = document.createElement("div");
+                row.className = "row";
+                row.innerHTML = `
+                    <div>
+                        <strong>${item.title}</strong><br/>
+                        <small>${item.summary}</small>
+                    </div>
+                    <div style="text-align:right;">
+                        <button data-id="${item.id}" class="cta-link">Ver ficha</button>
+                    </div>
+                `;
+                bestList.appendChild(row);
+            });
+        }
+
+        function showBestDetails(id) {
+            const item = bestInvestments.find((entry) => entry.id === id);
+            if (!item) return;
+            bestDetails.innerHTML = `
+                <h3 style="margin:0 0 6px;">${item.title}</h3>
+                <div class="chips" style="margin-bottom:8px;">
+                    ${item.tags.map((tag) => `<span class="chip">${tag}</span>`).join("")}
+                </div>
+                <div class="muted" style="margin-bottom:8px;">Melhores opcoes dentro da area:</div>
+                <div class="chips" style="margin-bottom:10px;">
+                    ${item.picks.map((pick) => `<span class="chip">${pick}</span>`).join("")}
+                </div>
+                <div class="advice">
+                    ${item.details.map((line) => `<div>${line}</div>`).join("")}
+                </div>
+            `;
+            bestModal.style.display = "flex";
+            bestModal.setAttribute("aria-hidden", "false");
+        }
+
+        function renderB3Board() {
+            b3Board.innerHTML = "";
+            const groups = { acoes: [], fiis: [], renda_fixa: [] };
+            Object.entries(b3Simulated).forEach(([ticker, data]) => {
+                groups[data.class].push([ticker, data]);
+            });
+            const labels = {
+                acoes: "Acoes",
+                fiis: "Fundos Imobiliarios",
+                renda_fixa: "Renda Fixa (simulado)"
+            };
+            Object.keys(groups).forEach((group) => {
+                const title = document.createElement("div");
+                title.style.marginTop = "6px";
+                title.style.fontWeight = "600";
+                title.textContent = labels[group];
+                b3Board.appendChild(title);
+                groups[group].forEach(([ticker, data]) => {
+                    const wrapper = document.createElement("div");
+                    wrapper.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; font-size:0.95rem;">
+                            <span><strong>${ticker}</strong> • ${data.sector}</span>
+                            <span>${toBRL(data.price)} (${data.change > 0 ? "+" : ""}${data.change}%)</span>
+                        </div>
+                        <div class="bar"><span style="width:${Math.min(100, Math.max(5, (data.price / data.range[1]) * 100))}%"></span></div>
+                    `;
+                    b3Board.appendChild(wrapper);
+                });
+            });
+        }
+
+        function populateTickers() {
+            const selectedClass = assetClassSelect.value;
+            const options = Object.entries(b3Simulated)
+                .filter(([, data]) => data.class === selectedClass)
+                .map(([ticker]) => ticker);
+            tickerSelect.innerHTML = "";
+            options.forEach((ticker) => {
+                const option = document.createElement("option");
+                option.value = ticker;
+                option.textContent = ticker;
+                tickerSelect.appendChild(option);
+            });
+        }
+
+        function renderEduGuide(investments) {
+            const totalValue = investments.reduce((sum, item) => sum + (b3Simulated[item.ticker].price * item.shares), 0);
+            const cashflow = load(STORAGE.flows, []);
+            const lastExpenses = cashflow.filter((item) => item.type === "despesa").slice(0, 3);
+            const focus = lastExpenses.length > 0 ? "Atencao nas ultimas despesas: " + lastExpenses.map((i) => i.desc).join(", ") + "." : "Sem despesas recentes cadastradas.";
+            const blocks = [
+                "Regra educativa: mantenha reserva de caixa antes de ampliar risco.",
+                "Diversifique setores e evite concentracao em um unico ativo.",
+                focus
+            ];
+            eduOutput.innerHTML = blocks.map((line) => `<div>${line}</div>`).join("");
+        }
+
+        capitalForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const formData = new FormData(capitalForm);
+            const data = {
+                company: formData.get("company").toString().trim(),
+                value: parseMoney(formData.get("capital"))
+            };
+            if (!data.company || data.value < 0) return;
+            save(STORAGE.capital, data);
+            capitalForm.reset();
+            renderCapital();
+            renderFlows();
+            updateTotals();
+        });
+
+        cashflowForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const formData = new FormData(cashflowForm);
+            const newFlow = {
+                desc: formData.get("flow-desc").toString().trim(),
+                type: formData.get("flow-type"),
+                amount: parseMoney(formData.get("flow-amount")),
+                date: formData.get("flow-date")
+            };
+            if (!newFlow.desc || newFlow.amount <= 0) return;
+            const flows = load(STORAGE.flows, []);
+            flows.unshift(newFlow);
+            save(STORAGE.flows, flows);
+            cashflowForm.reset();
+            setDefaultDate();
+            renderFlows();
+            updateTotals();
+        });
+
+        flowList.addEventListener("click", (event) => {
+            if (event.target.tagName !== "BUTTON") return;
+            const index = Number(event.target.getAttribute("data-index"));
+            const kind = event.target.getAttribute("data-kind");
+            if (kind === "real_investment") {
+                const investments = load(STORAGE.realInvestments, []);
+                investments.splice(index, 1);
+                save(STORAGE.realInvestments, investments);
+                renderRealInvestments();
+            } else {
+                const flows = load(STORAGE.flows, []);
+                flows.splice(index, 1);
+                save(STORAGE.flows, flows);
+            }
+            renderFlows();
+            updateTotals();
+        });
+
+        investForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const formData = new FormData(investForm);
+            const newItem = {
+                ticker: formData.get("ticker"),
+                shares: Number(formData.get("shares")),
+                avgPrice: parseMoney(formData.get("avg-price")),
+                goal: formData.get("goal"),
+                assetClass: formData.get("asset-class"),
+                date: formData.get("invest-date")
+            };
+            if (newItem.shares <= 0 || newItem.avgPrice <= 0) return;
+            const investments = load(STORAGE.investments, []);
+            investments.unshift(newItem);
+            save(STORAGE.investments, investments);
+            investForm.reset();
+            populateTickers();
+            renderInvestments();
+            updateTotals();
+        });
+
+        realInvestForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(realInvestForm);
+            const ticker = formData.get("real-ticker").toString().trim().toUpperCase();
+            const shares = Number(formData.get("real-shares"));
+            const goal = formData.get("real-goal");
+            const date = formData.get("real-date");
+            if (!ticker || shares <= 0) return;
+
+            const token = load(currentUserKey(), "");
+            if (!token) {
+                realStatus.textContent = "Salve o token antes de adicionar investimento real.";
+                return;
+            }
+
+            realStatus.textContent = "Buscando preco atual...";
+            try {
+                const response = await fetch(`http://localhost:3000/api/quote?tickers=${ticker}&token=${encodeURIComponent(token)}`);
+                const data = await response.json();
+                const price = data && data.results && data.results[0] ? data.results[0].regularMarketPrice : null;
+                if (!price) {
+                    realStatus.textContent = "Nao foi possivel obter o preco do ticker.";
+                    return;
+                }
+                const newItem = { ticker, shares, buyPrice: price, goal, date };
+                const investments = load(STORAGE.realInvestments, []);
+                investments.unshift(newItem);
+                save(STORAGE.realInvestments, investments);
+                realInvestForm.reset();
+                setDefaultDate();
+                renderRealInvestments();
+                updateTotals();
+                fetchRealQuotes();
+            } catch (err) {
+                realStatus.textContent = "Erro ao buscar preco do ticker.";
+            }
+        });
+
+        investList.addEventListener("click", (event) => {
+            if (event.target.tagName !== "BUTTON") return;
+            const index = Number(event.target.getAttribute("data-index"));
+            const investments = load(STORAGE.investments, []);
+            investments.splice(index, 1);
+            save(STORAGE.investments, investments);
+            renderInvestments();
+            updateTotals();
+        });
+
+        realInvestList.addEventListener("click", (event) => {
+            if (event.target.matches("[data-show='invested']")) {
+                const value = Number(event.target.getAttribute("data-value"));
+                const shares = event.target.getAttribute("data-shares");
+                const showing = event.target.getAttribute("data-state") === "value";
+                if (showing) {
+                    event.target.textContent = `${shares} cotas`;
+                    event.target.setAttribute("data-state", "shares");
+                } else {
+                    event.target.textContent = `Valor investido: ${toBRL(value)}`;
+                    event.target.setAttribute("data-state", "value");
+                }
+                return;
+            }
+            if (event.target.tagName !== "BUTTON") return;
+            const index = Number(event.target.getAttribute("data-index"));
+            const investments = load(STORAGE.realInvestments, []);
+            investments.splice(index, 1);
+            save(STORAGE.realInvestments, investments);
+            renderRealInvestments();
+            updateTotals();
+        });
+
+        bestList.addEventListener("click", (event) => {
+            if (event.target.tagName !== "BUTTON") return;
+            const id = event.target.getAttribute("data-id");
+            showBestDetails(id);
+        });
+
+        closeBestModal.addEventListener("click", () => {
+            bestModal.style.display = "none";
+            bestModal.setAttribute("aria-hidden", "true");
+        });
+
+        bestModal.addEventListener("click", (event) => {
+            if (event.target === bestModal) {
+                bestModal.style.display = "none";
+                bestModal.setAttribute("aria-hidden", "true");
+            }
+        });
+
+        assetClassSelect.addEventListener("change", () => {
+            populateTickers();
+        });
+
+        tokenForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const token = apiTokenInput.value.trim();
+            if (!token) {
+                realStatus.textContent = "Token vazio. Cole o token e salve.";
+                return;
+            }
+            try {
+                save(currentUserKey(), token);
+                realStatus.textContent = "Token salvo.";
+                fetchRealQuotes();
+            } catch (err) {
+                realStatus.textContent = "Nao foi possivel salvar o token no navegador.";
+            }
+        });
+
+        refreshReal.addEventListener("click", () => {
+            fetchRealQuotes();
+        });
+
+        tabReal.addEventListener("click", () => {
+            panelReal.style.display = "block";
+            panelSim.style.display = "none";
+        });
+
+        tabSim.addEventListener("click", () => {
+            panelReal.style.display = "none";
+            panelSim.style.display = "block";
+        });
+
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
+        });
+
+        function getUsers() {
+            const raw = localStorage.getItem("atlas_users");
+            return raw ? JSON.parse(raw) : [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem("atlas_users", JSON.stringify(users));
+        }
+
+        function getCurrentEmail() {
+            return (localStorage.getItem("atlas_current_user") || "").toLowerCase();
+        }
+
+        function getAvatarKey(email) {
+            return `atlas_avatar_${email || "default"}`;
+        }
+
+        function getSuggestionKey(email) {
+            return `atlas_suggestions_${email || "default"}`;
+        }
+
+        function initialsFromName(name, email) {
+            const base = name || email || "A";
+            const parts = base.trim().split(/\s+/).filter(Boolean);
+            const first = parts[0] ? parts[0][0] : "A";
+            const second = parts[1] ? parts[1][0] : "";
+            return (first + second).toUpperCase();
+        }
+
+        const avatarGradients = [
+            ["#2563eb", "#ef4444"],
+            ["#1d4ed8", "#f43f5e"],
+            ["#0ea5e9", "#2563eb"],
+            ["#ef4444", "#f97316"]
+        ];
+
+        function avatarPlaceholder(text, gradientIndex = 0) {
+            const colors = avatarGradients[gradientIndex % avatarGradients.length];
+            const c1 = colors[0];
+            const c2 = colors[1];
+            const safe = encodeURIComponent(text);
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'>
+                <defs>
+                    <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+                        <stop offset='0%' stop-color='${c1}'/>
+                        <stop offset='100%' stop-color='${c2}'/>
+                    </linearGradient>
+                </defs>
+                <rect width='120' height='120' rx='60' fill='url(#g)'/>
+                <text x='50%' y='54%' text-anchor='middle' font-size='44' fill='white' font-family='Arial' dy='.1em'>${safe}</text>
+            </svg>`;
+            return `data:image/svg+xml;utf8,${svg}`;
+        }
+
+        function getAvatarColorKey(email) {
+            return `atlas_avatar_color_${email || "default"}`;
+        }
+
+        function hydrateProfile() {
+            let email = getCurrentEmail();
+            const users = getUsers();
+            if (!email && users.length === 1) {
+                email = users[0].email;
+                localStorage.setItem("atlas_current_user", email);
+            }
+            const user = users.find((u) => u.email === email);
+            const displayName = user ? user.name : "Perfil";
+            const initials = initialsFromName(displayName, email);
+            const avatarKey = getAvatarKey(email);
+            const savedAvatar = localStorage.getItem(avatarKey);
+            const colorIndex = Number(localStorage.getItem(getAvatarColorKey(email)) || "0");
+            profileEmail.textContent = email ? email : "usuario@email.com";
+            profileName.textContent = displayName;
+            if (savedAvatar) {
+                profileBtn.classList.add("has-photo");
+                profileBtn.innerHTML = `<img src="${savedAvatar}" alt="Foto do perfil" />`;
+                profileAvatar.src = savedAvatar;
+            } else {
+                profileBtn.classList.remove("has-photo");
+                profileBtn.textContent = initials || "P";
+                const placeholder = avatarPlaceholder(initials || "A", colorIndex);
+                profileAvatar.src = placeholder;
+            }
+            const token = load(currentUserKey(), "");
+            tokenStatus.textContent = `Token: ${maskToken(token)}`;
+            const savedSuggestion = localStorage.getItem(getSuggestionKey(email)) || "";
+            suggestions.value = savedSuggestion;
+        }
+
+        profileBtn.addEventListener("click", () => {
+            const isOpen = profilePanel.style.display === "block";
+            profilePanel.style.display = isOpen ? "none" : "block";
+        });
+
+        closeProfile.addEventListener("click", () => {
+            profilePanel.style.display = "none";
+        });
+
+        supportToggle.addEventListener("click", () => {
+            supportModal.style.display = "flex";
+            supportModal.setAttribute("aria-hidden", "false");
+        });
+
+        closeSupportModal.addEventListener("click", () => {
+            supportModal.style.display = "none";
+            supportModal.setAttribute("aria-hidden", "true");
+        });
+
+        supportModal.addEventListener("click", (event) => {
+            if (event.target === supportModal) {
+                supportModal.style.display = "none";
+                supportModal.setAttribute("aria-hidden", "true");
+            }
+        });
+
+        togglePass.addEventListener("click", () => {
+            const isOpen = passPanel.style.display === "block";
+            passPanel.style.display = isOpen ? "none" : "block";
+        });
+
+        clearToken.addEventListener("click", () => {
+            localStorage.removeItem(currentUserKey());
+            tokenStatus.textContent = "Token removido.";
+            apiTokenInput.value = "";
+        });
+
+        profilePhoto.addEventListener("change", (event) => {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const email = getCurrentEmail();
+                const avatarKey = getAvatarKey(email);
+                localStorage.setItem(avatarKey, reader.result);
+                profileAvatar.src = reader.result;
+                profileBtn.classList.add("has-photo");
+                profileBtn.innerHTML = `<img src="${reader.result}" alt="Foto do perfil" />`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        profileAvatar.addEventListener("click", () => {
+            const email = getCurrentEmail();
+            const avatarKey = getAvatarKey(email);
+            const hasPhoto = Boolean(localStorage.getItem(avatarKey));
+            if (hasPhoto) return;
+            const key = getAvatarColorKey(email);
+            const current = Number(localStorage.getItem(key) || "0");
+            const next = (current + 1) % avatarGradients.length;
+            localStorage.setItem(key, String(next));
+            const initials = initialsFromName(profileName.textContent, email) || "A";
+            const placeholder = avatarPlaceholder(initials, next);
+            profileAvatar.src = placeholder;
+            profileBtn.textContent = initials;
+        });
+
+        saveSuggestions.addEventListener("click", () => {
+            const email = getCurrentEmail();
+            localStorage.setItem(getSuggestionKey(email), suggestions.value.trim());
+        });
+
+        savePass.addEventListener("click", () => {
+            const email = getCurrentEmail();
+            const current = currentPass.value.trim();
+            const next = newPass.value.trim();
+            if (!email || !current || !next) {
+                passMsg.textContent = "Preencha senha atual e nova senha.";
+                return;
+            }
+            if (!isStrongPassword(next)) {
+                passMsg.textContent = "Senha fraca. Use 8+ caracteres, maiuscula, minuscula e numero.";
+                return;
+            }
+            const users = getUsers();
+            const idx = users.findIndex((u) => u.email === email);
+            if (idx === -1 || users[idx].password !== current) {
+                passMsg.textContent = "Senha atual incorreta.";
+                return;
+            }
+            users[idx].password = next;
+            saveUsers(users);
+            currentPass.value = "";
+            newPass.value = "";
+            passMsg.textContent = "Senha atualizada.";
+        });
+
+
+        setDefaultDate();
+        apiTokenInput.value = load(currentUserKey(), "");
+        populateTickers();
+        renderCapital();
+        renderFlows();
+        renderInvestments();
+        renderRealInvestments();
+        updateTotals();
+        renderB3Board();
+        renderBestInvestments();
+        hydrateProfile();
+        fetchRealQuotes();
+
+        setInterval(() => {
+            fetchRealQuotes();
+        }, 60 * 60 * 1000);
+    </script>
+</body>
+</html>

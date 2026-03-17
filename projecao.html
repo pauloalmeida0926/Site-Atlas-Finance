@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Projecao de Investimentos</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap");
+
+        :root {
+            --bg: #eef3ff;
+            --card: rgba(255, 255, 255, 0.92);
+            --ink: #0f1a2b;
+            --muted: #516079;
+            --accent: #2563eb;
+            --shadow: 0 18px 50px rgba(9, 26, 59, 0.18);
+            --radius: 16px;
+            --border: #dbe4ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.18) 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, rgba(239, 68, 68, 0.16) 0%, transparent 55%),
+                var(--bg);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 30px 20px 10px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-family: "Playfair Display", serif;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 10px auto 40px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            border: 1px solid rgba(235, 225, 210, 0.6);
+        }
+
+        form { display: grid; gap: 10px; }
+        label { font-size: 0.85rem; color: var(--muted); }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 0.95rem;
+        }
+
+        button, .link-btn {
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .link-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid #e3d6c6;
+        }
+
+        .result {
+            margin-top: 12px;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .pill-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .pill-btn {
+            background: var(--accent);
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .logout-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Projecao de investimento</h1>
+        <p class="subtitle">Estimativas educativas baseadas em cota atual e quantidade.</p>
+    </header>
+    <main class="container">
+        <section class="card">
+            <div class="top-actions">
+                <div></div>
+                <button id="logout-btn" class="logout-btn" type="button">Sair</button>
+            </div>
+            <div class="pill-row">
+                <a class="pill-btn" href="index.html">Reais</a>
+                <a class="pill-btn" href="index.html">Simulacao</a>
+                <span class="pill-btn" style="background:#1d4ed8;">Projecao</span>
+            </div>
+
+            <form id="proj-form">
+                <div>
+                    <label for="asset-class">Classe</label>
+                    <select id="asset-class" name="asset-class" required>
+                        <option value="acoes">Acoes</option>
+                        <option value="fiis">Fundos Imobiliarios</option>
+                        <option value="renda_fixa">Renda Fixa</option>
+                    </select>
+                </div>
+                <div id="ticker-row">
+                    <label for="ticker">Ticker</label>
+                    <input id="ticker" name="ticker" type="text" placeholder="Ex.: MXRF11" />
+                </div>
+                <div id="shares-row">
+                    <label for="shares">Quantidade de cotas</label>
+                    <input id="shares" name="shares" type="number" min="1" step="1" />
+                </div>
+                <div id="value-row" style="display:none;">
+                    <label for="value">Valor investido (R$)</label>
+                    <input id="value" name="value" type="text" inputmode="decimal" placeholder="Ex.: 5000,00" />
+                </div>
+                <div>
+                    <label for="months">Periodo (meses)</label>
+                    <input id="months" name="months" type="number" min="1" step="1" required />
+                </div>
+                <button type="submit">Calcular</button>
+                <div class="muted">Usa o token salvo no app (aba Reais) para buscar a cotacao atual.</div>
+            </form>
+            <div id="proj-result" class="result"></div>
+            <div style="margin-top:12px;">
+                <a class="link-btn" href="index.html">Voltar ao app</a>
+            </div>
+        </section>
+    </main>
+    <script>
+        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
+        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+            localStorage.removeItem("atlas_logged");
+            localStorage.removeItem("atlas_session_expires");
+            window.location.href = "login.html";
+        }
+
+        const form = document.getElementById("proj-form");
+        const result = document.getElementById("proj-result");
+        const classSelect = document.getElementById("asset-class");
+        const tickerRow = document.getElementById("ticker-row");
+        const sharesRow = document.getElementById("shares-row");
+        const valueRow = document.getElementById("value-row");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        function parseMoney(raw) {
+            const normalized = String(raw).replace(/\./g, "").replace(",", ".");
+            const value = Number(normalized);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function toBRL(value) {
+            return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        }
+
+        function toggleFields() {
+            const cls = classSelect.value;
+            const isFixed = cls === "renda_fixa";
+            tickerRow.style.display = isFixed ? "none" : "block";
+            sharesRow.style.display = isFixed ? "none" : "block";
+            valueRow.style.display = isFixed ? "block" : "none";
+        }
+
+        async function fetchQuote(ticker, token) {
+            const base = location.origin && location.origin.startsWith("http")
+                ? location.origin
+                : "http://localhost:3000";
+            const response = await fetch(`${base}/api/quote?tickers=${encodeURIComponent(ticker)}&token=${encodeURIComponent(token)}`);
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data && (data.message || data.error || data.detail) || "erro");
+            }
+            const price = data && data.results && data.results[0] ? data.results[0].regularMarketPrice : null;
+            if (!price) throw new Error("preco_indisponivel");
+            return price;
+        }
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const cls = form["asset-class"].value;
+            const months = Number(form.months.value);
+            if (months <= 0) return;
+
+            const currentUser = localStorage.getItem("atlas_current_user") || "default";
+            const tokenKey = `atlas_api_token_${currentUser}`;
+            const token = localStorage.getItem(tokenKey);
+            let cleanToken = "";
+            try {
+                cleanToken = token ? JSON.parse(token) : "";
+            } catch {
+                cleanToken = token || "";
+            }
+            if (cls !== "renda_fixa" && !cleanToken) {
+                result.textContent = "Token nao encontrado. Salve o token na aba Reais.";
+                return;
+            }
+
+            const yieldMap = {
+                acoes: 0.003,
+                fiis: 0.008,
+                renda_fixa: 0.008
+            };
+
+            if (cls === "renda_fixa") {
+                const value = parseMoney(form.value.value);
+                if (value <= 0) return;
+                const rate = yieldMap.renda_fixa;
+                const finalValue = value * Math.pow(1 + rate, months);
+                const gain = finalValue - value;
+                result.textContent = `Valor final: ${toBRL(finalValue)} | Rendimento estimado: ${toBRL(gain)} (${(rate * 100).toFixed(2)}% ao mes)`;
+                return;
+            }
+
+            const ticker = form.ticker.value.trim().toUpperCase();
+            const shares = Number(form.shares.value);
+            if (!ticker || shares <= 0) return;
+
+            result.textContent = "Buscando cotacao...";
+            fetchQuote(ticker, cleanToken)
+                .then((price) => {
+                    const invested = price * shares;
+                    const monthlyYield = yieldMap[cls];
+                    const dividendPerShare = price * monthlyYield;
+                    const estimatedMonthly = dividendPerShare * shares;
+                    const estimatedTotal = invested * Math.pow(1 + monthlyYield, months);
+                    const gain = estimatedTotal - invested;
+                    result.textContent = `Preco atual: ${toBRL(price)} | Valor investido: ${toBRL(invested)} | Dividendo estimado por cota: ${toBRL(dividendPerShare)} | Rendimento estimado: ${toBRL(gain)} em ${months} meses`;
+                })
+                .catch((err) => {
+                    const originHint = location.origin && location.origin.startsWith("http")
+                        ? ""
+                        : " Abra esta pagina em http://localhost:3000/projecao.html";
+                    result.textContent = `Nao foi possivel buscar a cotacao. (${err.message || "erro"})${originHint}`;
+                });
+        });
+
+        toggleFields();
+        classSelect.addEventListener("change", toggleFields);
+
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
+        });
+    </script>
+</body>
+</html>

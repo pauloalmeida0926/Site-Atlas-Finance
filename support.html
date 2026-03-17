@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Suporte - Chat com Bot</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap");
+
+        :root {
+            --bg: #eef3ff;
+            --card: rgba(255, 255, 255, 0.92);
+            --ink: #0f1a2b;
+            --muted: #516079;
+            --accent: #2563eb;
+            --accent-2: #ef4444;
+            --shadow: 0 18px 50px rgba(9, 26, 59, 0.18);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.18) 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, rgba(239, 68, 68, 0.16) 0%, transparent 55%),
+                var(--bg);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 30px 20px 10px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-family: "Playfair Display", serif;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 10px auto 40px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .chat-box {
+            border: 1px solid #efe6d7;
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .chat-msg {
+            padding: 8px 10px;
+            border-radius: 10px;
+            margin: 6px 0;
+            font-size: 0.95rem;
+        }
+
+        .chat-msg.bot {
+            background: rgba(37, 99, 235, 0.12);
+            color: #1b3b7a;
+            white-space: pre-line;
+        }
+
+        .chat-msg.user {
+            background: rgba(239, 68, 68, 0.12);
+            color: #6b1d1d;
+            text-align: right;
+        }
+
+        .chat-options {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        button, .link-btn {
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .link-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid #e3d6c6;
+        }
+
+        .actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .logout-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid #dbe4ff;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Chat com bot</h1>
+        <p class="subtitle">Respostas rapidas para as duvidas mais comuns.</p>
+    </header>
+    <main class="container">
+        <section class="card">
+            <div class="top-actions">
+                <div></div>
+                <button id="logout-btn" class="logout-btn" type="button">Sair</button>
+            </div>
+            <div class="chat-box">
+                <div id="chat-messages"></div>
+                <div id="chat-options" class="chat-options"></div>
+            </div>
+            <div class="actions">
+                <a class="link-btn" href="index.html">Voltar ao app</a>
+                <a class="link-btn" href="https://wa.me/5532999370796" target="_blank" rel="noreferrer">WhatsApp</a>
+                <a class="link-btn" href="mailto:pauloalmeidappp750@gmail.com">Email</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
+        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+            localStorage.removeItem("atlas_logged");
+            localStorage.removeItem("atlas_session_expires");
+            window.location.href = "login.html";
+        }
+
+        const chatMessages = document.getElementById("chat-messages");
+        const chatOptions = document.getElementById("chat-options");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        const chatTree = {
+            start: {
+                text: "Oi! Como posso ajudar?",
+                options: [
+                    { label: "Como salvar token da API?", next: "token" },
+                    { label: "Erro ao buscar cotacoes", next: "quotes" },
+                    { label: "Diferenca entre real e simulacao", next: "sim" },
+                    { label: "Falar com atendimento humano", next: "human" }
+                ]
+            },
+            token: {
+                text: "Passo a passo:\n1) Va em Investimentos > Reais.\n2) Cole o token no campo.\n3) Clique em Salvar token.\n4) Clique em Atualizar cotacoes.",
+                options: [
+                    { label: "Token por usuario", next: "token_user" },
+                    { label: "Ainda nao salvou", next: "token_fix" },
+                    { label: "Voltar ao menu", next: "start" }
+                ]
+            },
+            token_user: {
+                text: "Passo a passo para token individual:\n1) Acesse brapi.dev e crie sua conta.\n2) Gere o token no painel.\n3) Copie o token.\n4) No app (Investimentos > Reais), cole e clique em Salvar token.",
+                options: [
+                    { label: "Abrir brapi.dev", action: "brapi" },
+                    { label: "Voltar ao menu", next: "start" }
+                ]
+            },
+            token_fix: {
+                text: "Confirme se abriu pelo http://localhost:3000 e se o servidor esta rodando.",
+                options: [
+                    { label: "Voltar ao menu", next: "start" },
+                    { label: "Falar com atendimento humano", next: "human" }
+                ]
+            },
+            quotes: {
+                text: "Verifique token valido e clique em Atualizar cotacoes. Se falhar, tente de novo em 1 minuto.",
+                options: [
+                    { label: "Voltar ao menu", next: "start" },
+                    { label: "Falar com atendimento humano", next: "human" }
+                ]
+            },
+            sim: {
+                text: "Simulacao usa dados ficticios e nao altera o capital real da empresa.",
+                options: [
+                    { label: "Voltar ao menu", next: "start" }
+                ]
+            },
+            human: {
+                text: "Entre em contato com atendimento humano pelos canais abaixo.",
+                options: [
+                    { label: "Abrir WhatsApp", action: "whatsapp" },
+                    { label: "Enviar email", action: "email" },
+                    { label: "Voltar ao menu", next: "start" }
+                ]
+            }
+        };
+
+        function pushMessage(text, who) {
+            const msg = document.createElement("div");
+            msg.className = `chat-msg ${who}`;
+            msg.textContent = text;
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function renderChat(nodeId) {
+            const node = chatTree[nodeId];
+            if (!node) return;
+            pushMessage(node.text, "bot");
+            chatOptions.innerHTML = "";
+            node.options.forEach((opt) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.textContent = opt.label;
+                btn.addEventListener("click", () => {
+                    pushMessage(opt.label, "user");
+                    if (opt.action === "whatsapp") {
+                        window.open("https://wa.me/5532999370796", "_blank", "noreferrer");
+                        return;
+                    }
+                    if (opt.action === "email") {
+                        window.location.href = "mailto:pauloalmeidappp750@gmail.com";
+                        return;
+                    }
+                    if (opt.action === "brapi") {
+                        window.open("https://brapi.dev", "_blank", "noreferrer");
+                        return;
+                    }
+                    renderChat(opt.next);
+                });
+                chatOptions.appendChild(btn);
+            });
+        }
+
+        renderChat("start");
+
+        logoutBtn.addEventListener("click", () => {
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
+        });
+    </script>
+</body>
+</html>

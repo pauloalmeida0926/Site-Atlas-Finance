@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Comparacao Historica</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap");
+
+        :root {
+            --bg: #eef3ff;
+            --card: rgba(255, 255, 255, 0.92);
+            --ink: #0f1a2b;
+            --muted: #516079;
+            --accent: #2563eb;
+            --danger: #dc2626;
+            --shadow: 0 18px 50px rgba(9, 26, 59, 0.18);
+            --radius: 16px;
+            --border: #dbe4ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1200px 600px at 10% -10%, rgba(37, 99, 235, 0.18) 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 0%, rgba(239, 68, 68, 0.16) 0%, transparent 55%),
+                var(--bg);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 30px 20px 10px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-family: "Playfair Display", serif;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 10px auto 40px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            border: 1px solid rgba(219, 228, 255, 0.7);
+        }
+
+        form { display: grid; gap: 10px; }
+        label { font-size: 0.85rem; color: var(--muted); }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 0.95rem;
+        }
+
+        button, .link-btn {
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .link-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--border);
+        }
+
+        .result {
+            margin-top: 12px;
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .table th, .table td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .chart {
+            width: 100%;
+            height: 180px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Comparacao historica</h1>
+        <p class="subtitle">Compare a cotacao de hoje com uma data escolhida.</p>
+    </header>
+    <main class="container">
+        <section class="card">
+            <form id="compare-form">
+                <div>
+                    <label for="ticker">Ticker</label>
+                    <input id="ticker" name="ticker" placeholder="Ex.: MXRF11" required />
+                </div>
+                <div>
+                    <label for="range">Intervalo de historico</label>
+                    <select id="range" name="range">
+                        <option value="1d">1 dia</option>
+                        <option value="5d">5 dias</option>
+                        <option value="1mo">1 mes</option>
+                        <option value="3mo" selected>3 meses</option>
+                    </select>
+                </div>
+                <button type="submit">Comparar</button>
+                <div class="result" id="compare-result"></div>
+            </form>
+            <svg id="history-chart" class="chart" viewBox="0 0 600 180" preserveAspectRatio="none"></svg>
+            <table class="table" id="history-table"></table>
+            <div style="margin-top:10px; display:none;" id="toggle-wrap">
+                <button id="toggle-rows" class="link-btn" type="button">Ver mais</button>
+            </div>
+            <div style="margin-top:12px;">
+                <a class="link-btn" href="index.html">Voltar ao app</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        if (localStorage.getItem("atlas_logged") !== "true") {
+            window.location.href = "login.html";
+        }
+
+            const form = document.getElementById("compare-form");
+            const result = document.getElementById("compare-result");
+        const table = document.getElementById("history-table");
+        const toggleRows = document.getElementById("toggle-rows");
+        const toggleWrap = document.getElementById("toggle-wrap");
+        let showAllRows = false;
+        let lastSeries = [];
+            const chart = document.getElementById("history-chart");
+
+        function toBRL(value) {
+            return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        }
+
+        function formatDate(ts) {
+            const d = new Date(ts);
+            return d.toISOString().split("T")[0];
+        }
+
+        function parseHistory(data) {
+            const list = (data && data.results && data.results[0] && data.results[0].historicalDataPrice) || [];
+            return list.map((item) => ({
+                date: item.date * 1000,
+                close: item.close
+            }));
+        }
+
+        function nearestByDate(series, targetDate) {
+            let best = null;
+            let bestDiff = Infinity;
+            series.forEach((p) => {
+                const diff = Math.abs(p.date - targetDate);
+                if (diff < bestDiff) {
+                    best = p;
+                    bestDiff = diff;
+                }
+            });
+            return best;
+        }
+
+        function renderTable(series) {
+            const head = `<tr><th>Data</th><th>Fechamento</th></tr>`;
+            const list = showAllRows ? series : series.slice(-4);
+            const rows = list.reverse().map((p) => {
+                return `<tr><td>${formatDate(p.date)}</td><td>${toBRL(p.close)}</td></tr>`;
+            }).join("");
+            table.innerHTML = head + rows;
+            if (toggleWrap) {
+                toggleWrap.style.display = series.length > 4 ? "block" : "none";
+            }
+        }
+
+        function renderChart(series) {
+            if (!series.length) {
+                chart.innerHTML = "";
+                return;
+            }
+            const min = Math.min(...series.map((p) => p.close));
+            const max = Math.max(...series.map((p) => p.close));
+            const points = series.map((p, i) => {
+                const x = (i / (series.length - 1)) * 600;
+                const y = 180 - ((p.close - min) / (max - min || 1)) * 160 - 10;
+                return `${x},${y}`;
+            }).join(" ");
+            chart.innerHTML = `<polyline fill="none" stroke="#2563eb" stroke-width="2" points="${points}"></polyline>`;
+        }
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const ticker = form.ticker.value.trim().toUpperCase();
+            if (!ticker) return;
+
+        const currentUser = localStorage.getItem("atlas_current_user") || "default";
+        const tokenKey = `atlas_api_token_${currentUser}`;
+        const tokenRaw = localStorage.getItem(tokenKey);
+            let token = "";
+            try {
+                token = tokenRaw ? JSON.parse(tokenRaw) : "";
+            } catch {
+                token = tokenRaw || "";
+            }
+            if (!token) {
+                result.textContent = "Token nao encontrado. Salve o token na aba Reais.";
+                return;
+            }
+
+            result.textContent = "Buscando historico...";
+            try {
+            const range = form.range.value;
+            const response = await fetch(`/api/history?ticker=${encodeURIComponent(ticker)}&range=${encodeURIComponent(range)}&interval=1d&token=${encodeURIComponent(token)}`);
+                const data = await response.json();
+                if (!response.ok) {
+                    const detail = data && (data.message || data.error || data.detail);
+                    result.textContent = detail ? `Erro ao buscar historico: ${detail}` : "Erro ao buscar historico.";
+                    return;
+                }
+                const series = parseHistory(data);
+                if (!series.length) {
+                    result.textContent = "Sem dados historicos para este ticker.";
+                    return;
+                }
+                const today = series[series.length - 1];
+                const target = series[0];
+                const diff = today.close - target.close;
+                const pct = (diff / target.close) * 100;
+                result.textContent = `Hoje: ${toBRL(today.close)} | Inicio do periodo (${formatDate(target.date)}): ${toBRL(target.close)} | Variacao: ${toBRL(diff)} (${pct.toFixed(2)}%)`;
+                showAllRows = false;
+                toggleRows.textContent = "Ver mais";
+                lastSeries = series;
+                renderChart(series);
+                renderTable(series);
+            } catch (err) {
+                result.textContent = `Falha ao buscar historico. (${err && err.message ? err.message : "erro"})`;
+            }
+        });
+
+        toggleRows.addEventListener("click", () => {
+            showAllRows = !showAllRows;
+            toggleRows.textContent = showAllRows ? "Ver menos" : "Ver mais";
+            if (lastSeries.length) {
+                renderTable(lastSeries);
+            }
+        });
+    </script>
+</body>
+</html>
