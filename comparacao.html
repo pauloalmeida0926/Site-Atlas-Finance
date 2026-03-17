@@ -224,6 +224,14 @@
             chart.innerHTML = `<polyline fill="none" stroke="#2563eb" stroke-width="2" points="${points}"></polyline>`;
         }
 
+        function buildHistoryUrl(ticker, range, token) {
+            const isGithub = window.location.hostname.includes("github.io");
+            if (isGithub) {
+                return `https://brapi.dev/api/quote/${encodeURIComponent(ticker)}?range=${encodeURIComponent(range)}&interval=1d&token=${encodeURIComponent(token)}`;
+            }
+            return `/api/history?ticker=${encodeURIComponent(ticker)}&range=${encodeURIComponent(range)}&interval=1d&token=${encodeURIComponent(token)}`;
+        }
+
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             const ticker = form.ticker.value.trim().toUpperCase();
@@ -246,7 +254,8 @@
             result.textContent = "Buscando historico...";
             try {
             const range = form.range.value;
-            const response = await fetch(`/api/history?ticker=${encodeURIComponent(ticker)}&range=${encodeURIComponent(range)}&interval=1d&token=${encodeURIComponent(token)}`);
+            const url = buildHistoryUrl(ticker, range, token);
+            const response = await fetch(url);
                 const data = await response.json();
                 if (!response.ok) {
                     const detail = data && (data.message || data.error || data.detail);
