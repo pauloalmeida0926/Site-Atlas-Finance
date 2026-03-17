@@ -1359,6 +1359,11 @@
             try {
                 const response = await fetch(buildQuoteUrl(ticker, token));
                 const data = await response.json();
+                if (!response.ok) {
+                    const detail = data && (data.message || data.error || data.detail);
+                    realStatus.textContent = detail ? `Erro: ${detail}` : "Erro ao buscar cotacao.";
+                    return;
+                }
                 const price = data && data.results && data.results[0] ? data.results[0].regularMarketPrice : null;
                 if (!price) {
                     realStatus.textContent = "Nao foi possivel obter o preco do ticker.";
@@ -1374,7 +1379,7 @@
                 updateTotals();
                 fetchRealQuotes();
             } catch (err) {
-                realStatus.textContent = "Erro ao buscar preco do ticker.";
+                realStatus.textContent = `Erro ao buscar preco do ticker. (${err && err.message ? err.message : "falha de rede"})`;
             }
         });
 

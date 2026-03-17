@@ -222,11 +222,19 @@
             valueRow.style.display = isFixed ? "block" : "none";
         }
 
-        async function fetchQuote(ticker, token) {
+        function buildQuoteUrl(ticker, token) {
+            const isGithub = window.location.hostname.includes("github.io");
+            if (isGithub) {
+                return `https://brapi.dev/api/quote/${encodeURIComponent(ticker)}?token=${encodeURIComponent(token)}`;
+            }
             const base = location.origin && location.origin.startsWith("http")
                 ? location.origin
                 : "http://localhost:3000";
-            const response = await fetch(`${base}/api/quote?tickers=${encodeURIComponent(ticker)}&token=${encodeURIComponent(token)}`);
+            return `${base}/api/quote?tickers=${encodeURIComponent(ticker)}&token=${encodeURIComponent(token)}`;
+        }
+
+        async function fetchQuote(ticker, token) {
+            const response = await fetch(buildQuoteUrl(ticker, token));
             const data = await response.json();
             if (!response.ok) {
                 throw new Error(data && (data.message || data.error || data.detail) || "erro");
