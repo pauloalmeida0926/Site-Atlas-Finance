@@ -641,7 +641,10 @@
         </div>
 
         <div class="profile-section">
-            <button id="toggle-pass" class="support-toggle" type="button">Alterar senha</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button id="toggle-pass" class="support-toggle" type="button" style="flex:1;">Alterar senha</button>
+                <button id="support-toggle" class="support-toggle" type="button" style="flex:1;">Suporte</button>
+            </div>
             <div id="pass-panel" style="display:none; margin-top:10px;">
                 <div>
                     <input id="current-pass" type="password" placeholder="Senha atual" />
@@ -661,15 +664,11 @@
         </div>
 
         <div class="profile-section">
-            <button id="support-toggle" class="support-toggle" type="button">Suporte</button>
-        </div>
-
-        <div class="profile-section">
-            <button id="logout-btn" class="logout-btn" type="button">Sair</button>
-        </div>
-        <div class="profile-section">
-            <button id="switch-account" class="cta-link" type="button">Adicionar outra conta</button>
-            <button id="delete-account" class="logout-btn" type="button" style="margin-top:8px;">Excluir conta</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button id="logout-btn-2" class="logout-btn" type="button" style="flex:1;">Sair</button>
+                <button id="switch-account" class="cta-link" type="button" style="flex:1;">Adicionar conta</button>
+                <button id="delete-account" class="logout-btn" type="button" style="flex:1;">Excluir conta</button>
+            </div>
         </div>
     </div>
 
@@ -802,7 +801,7 @@
         const bestDetails = document.getElementById("best-details");
         const bestModal = document.getElementById("best-modal");
         const closeBestModal = document.getElementById("close-best-modal");
-        const logoutBtn = document.getElementById("logout-btn");
+        const logoutBtn2 = document.getElementById("logout-btn-2");
         const profileBtn = document.getElementById("profile-btn");
         const profilePanel = document.getElementById("profile-panel");
         const closeProfile = document.getElementById("close-profile");
@@ -1455,7 +1454,7 @@
             panelSim.style.display = "block";
         });
 
-        logoutBtn.addEventListener("click", () => {
+        logoutBtn2.addEventListener("click", () => {
             localStorage.removeItem("atlas_logged");
             window.location.href = "login.html";
         });
