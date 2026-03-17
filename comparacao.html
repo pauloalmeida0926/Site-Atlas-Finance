@@ -153,9 +153,10 @@
         </section>
     </main>
 
-    <script type="module">
-        import { requireAuth } from "./auth.js";
-        requireAuth();
+    <script>
+        if (localStorage.getItem("atlas_logged") !== "true") {
+            window.location.href = "login.html";
+        }
 
             const form = document.getElementById("compare-form");
             const result = document.getElementById("compare-result");

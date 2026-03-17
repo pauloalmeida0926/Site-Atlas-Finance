@@ -190,9 +190,13 @@
             </div>
         </section>
     </main>
-    <script type="module">
-        import { requireAuth, signOutUser } from "./auth.js";
-        requireAuth();
+    <script>
+        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
+        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+            localStorage.removeItem("atlas_logged");
+            localStorage.removeItem("atlas_session_expires");
+            window.location.href = "login.html";
+        }
 
         const form = document.getElementById("proj-form");
         const result = document.getElementById("proj-result");
@@ -297,7 +301,8 @@
         classSelect.addEventListener("change", toggleFields);
 
         logoutBtn.addEventListener("click", () => {
-            signOutUser();
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
         });
     </script>
 </body>
