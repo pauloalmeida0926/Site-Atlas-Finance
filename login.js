@@ -162,27 +162,8 @@ resetBack.addEventListener("click", () => {
 
 resetForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  const email = resetForm["reset-email"].value.trim().toLowerCase();
-  const newPassword = resetForm["reset-password"].value.trim();
-  if (!email || !newPassword) {
-    resetMsg.textContent = "Preencha todos os campos.";
-    resetMsg.className = "error";
-    return;
-  }
-  if (!isStrongPassword(newPassword)) {
-    resetMsg.textContent = "Senha fraca. Use 8+ caracteres, maiuscula, minuscula e numero.";
-    resetMsg.className = "error";
-    return;
-  }
-  sendPasswordResetEmail(auth, email)
-    .then(() => {
-      resetMsg.textContent = "Email de redefinicao enviado. Verifique sua caixa de entrada.";
-      resetMsg.className = "success";
-    })
-    .catch(() => {
-      resetMsg.textContent = "Nao foi possivel enviar o email.";
-      resetMsg.className = "error";
-    });
+  resetMsg.textContent = "Redefinicao por email desativada no momento.";
+  resetMsg.className = "error";
 });
 
 codeVerify.addEventListener("click", async () => {
