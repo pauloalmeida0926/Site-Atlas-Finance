@@ -667,6 +667,10 @@
         <div class="profile-section">
             <button id="logout-btn" class="logout-btn" type="button">Sair</button>
         </div>
+        <div class="profile-section">
+            <button id="switch-account" class="cta-link" type="button">Adicionar outra conta</button>
+            <button id="delete-account" class="logout-btn" type="button" style="margin-top:8px;">Excluir conta</button>
+        </div>
     </div>
 
     <div id="best-modal" class="modal-overlay" aria-hidden="true">
@@ -716,10 +720,8 @@
     </div>
 
     <script>
-        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
-        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+        if (localStorage.getItem("atlas_logged") !== "true") {
             localStorage.removeItem("atlas_logged");
-            localStorage.removeItem("atlas_session_expires");
             window.location.href = "login.html";
         }
 

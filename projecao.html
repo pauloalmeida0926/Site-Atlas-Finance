@@ -191,10 +191,8 @@
         </section>
     </main>
     <script>
-        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
-        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+        if (localStorage.getItem("atlas_logged") !== "true") {
             localStorage.removeItem("atlas_logged");
-            localStorage.removeItem("atlas_session_expires");
             window.location.href = "login.html";
         }
 

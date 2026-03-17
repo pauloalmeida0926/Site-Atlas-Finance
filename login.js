@@ -26,8 +26,7 @@ function goToApp(email) {
     localStorage.setItem("atlas_current_user", email.toLowerCase());
   }
   localStorage.setItem("atlas_logged", "true");
-  const expires = Date.now() + (8 * 60 * 60 * 1000);
-  localStorage.setItem("atlas_session_expires", String(expires));
+  localStorage.removeItem("atlas_session_expires");
   window.location.href = "index.html";
 }
 
