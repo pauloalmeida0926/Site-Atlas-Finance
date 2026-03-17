@@ -455,39 +455,6 @@
                 <button type="submit">Adicionar</button>
                 </form>
             </div>
-            <div class="card">
-                <h3 style="margin:0 0 10px;">Resumo financeiro</h3>
-            <div class="summary">
-                <div class="summary-item">
-                    <span>Empresa</span>
-                    <strong id="company-name">-</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Capital atual</span>
-                    <strong id="capital-current">R$ 0,00</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Investimentos (reais)</span>
-                    <strong id="total-invested-real">R$ 0,00</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Rendimento atual</span>
-                    <strong id="total-yield">R$ 0,00</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Receitas</span>
-                    <strong id="total-revenue">R$ 0,00</strong>
-                </div>
-                <div class="summary-item">
-                    <span>Despesas</span>
-                    <strong id="total-expense">R$ 0,00</strong>
-                </div>
-            </div>
-            <div style="margin-top:14px;">
-                <h3 style="margin:0 0 8px; font-size:1rem;">Fluxo por mes</h3>
-                <div id="monthly-chart" class="chart"></div>
-            </div>
-            </div>
         </section>
 
         <section class="section">
@@ -590,6 +557,45 @@
                 <button type="submit">Adicionar investimento</button>
                 </form>
                 <div id="invest-list" class="list" style="margin-top:12px;"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2>Resumo financeiro</h2>
+                <span class="muted">Consolidado do caixa e investimentos</span>
+            </div>
+            <div class="card">
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Empresa</span>
+                        <strong id="company-name">-</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Capital atual</span>
+                        <strong id="capital-current">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Investimentos (reais)</span>
+                        <strong id="total-invested-real">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Rendimento atual</span>
+                        <strong id="total-yield">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Receitas</span>
+                        <strong id="total-revenue">R$ 0,00</strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Despesas</span>
+                        <strong id="total-expense">R$ 0,00</strong>
+                    </div>
+                </div>
+                <div style="margin-top:14px;">
+                    <h3 style="margin:0 0 8px; font-size:1rem;">Fluxo por mes</h3>
+                    <div id="monthly-chart" class="chart"></div>
+                </div>
             </div>
         </section>
 
