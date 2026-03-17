@@ -18,11 +18,6 @@ const forgotBtn = document.getElementById("forgot-btn");
 const resetBack = document.getElementById("reset-back");
 const loginEmailInput = document.getElementById("login-email");
 const loginPasswordInput = document.getElementById("login-password");
-const codeWrap = document.getElementById("code-wrap");
-const loginCodeInput = document.getElementById("login-code");
-const codeHint = document.getElementById("code-hint");
-const codeVerify = document.getElementById("code-verify");
-const codeResend = document.getElementById("code-resend");
 let pendingLoginEmail = "";
 
 function goToApp(email) {
@@ -58,7 +53,6 @@ function showForm(view) {
   tabSignup.classList.toggle("active", view === "signup");
   tabLogin.classList.toggle("active", view === "login");
   if (view !== "login") {
-    codeWrap.style.display = "none";
     pendingLoginEmail = "";
   }
 }
@@ -124,26 +118,12 @@ loginForm.addEventListener("submit", (event) => {
     loginMsg.className = "error";
     return;
   }
-  if (pendingLoginEmail && pendingLoginEmail === email) {
-    loginMsg.textContent = "Digite o codigo para concluir o login.";
-    loginMsg.className = "error";
-    return;
-  }
   signInWithEmailAndPassword(auth, email, password)
     .then(async (cred) => {
       setUserState(cred.user);
-      pendingLoginEmail = email;
-      try {
-        await sendLoginCode(email);
-        loginMsg.textContent = "Codigo de verificacao enviado. Digite para entrar.";
-        loginMsg.className = "success";
-      } catch (err) {
-        const msg = err && err.message === "resend_key_missing"
-          ? "Chave do Resend nao configurada."
-          : "Nao foi possivel enviar o codigo.";
-        loginMsg.textContent = msg;
-        loginMsg.className = "error";
-      }
+      loginMsg.textContent = "Login ok. Redirecionando...";
+      loginMsg.className = "success";
+      setTimeout(() => goToApp(email), 300);
     })
     .catch(() => {
       loginMsg.textContent = "Email ou senha invalidos.";
@@ -164,61 +144,6 @@ resetForm.addEventListener("submit", (event) => {
   event.preventDefault();
   resetMsg.textContent = "Redefinicao por email desativada no momento.";
   resetMsg.className = "error";
-});
-
-codeVerify.addEventListener("click", async () => {
-  const email = pendingLoginEmail;
-  const code = loginCodeInput.value.trim();
-  if (!email) {
-    loginMsg.textContent = "Inicie o login para receber o codigo.";
-    loginMsg.className = "error";
-    return;
-  }
-  if (!code) {
-    loginMsg.textContent = "Digite o codigo.";
-    loginMsg.className = "error";
-    return;
-  }
-  try {
-    const response = await fetch("/api/verify-code", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, code })
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const err = data && data.error ? data.error : "invalid_code";
-      loginMsg.textContent = err === "invalid_code" ? "Codigo invalido." : "Nao foi possivel validar.";
-      loginMsg.className = "error";
-      return;
-    }
-    loginMsg.textContent = "Login ok. Redirecionando...";
-    loginMsg.className = "success";
-    setTimeout(() => goToApp(email), 300);
-  } catch {
-    loginMsg.textContent = "Falha ao validar codigo.";
-    loginMsg.className = "error";
-  }
-});
-
-codeResend.addEventListener("click", async () => {
-  const email = pendingLoginEmail;
-  if (!email) {
-    loginMsg.textContent = "Inicie o login para reenviar o codigo.";
-    loginMsg.className = "error";
-    return;
-  }
-  try {
-    await sendLoginCode(email);
-    loginMsg.textContent = "Novo codigo enviado.";
-    loginMsg.className = "success";
-  } catch (err) {
-    const msg = err && err.message === "resend_key_missing"
-      ? "Chave do Resend nao configurada."
-      : "Nao foi possivel reenviar.";
-    loginMsg.textContent = msg;
-    loginMsg.className = "error";
-  }
 });
 
 document.addEventListener("click", (event) => {
