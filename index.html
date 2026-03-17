@@ -715,10 +715,13 @@
         </div>
     </div>
 
-    <script type="module">
-        import { requireAuth, signOutUser, auth } from "./auth.js";
-        import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-        requireAuth();
+    <script>
+        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
+        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
+            localStorage.removeItem("atlas_logged");
+            localStorage.removeItem("atlas_session_expires");
+            window.location.href = "login.html";
+        }
 
         const STORAGE = {
             capital: "atlas_capital",
@@ -1449,7 +1452,8 @@
         });
 
         logoutBtn.addEventListener("click", () => {
-            signOutUser();
+            localStorage.removeItem("atlas_logged");
+            window.location.href = "login.html";
         });
 
         function getUsers() {
@@ -1614,7 +1618,7 @@
             localStorage.setItem(getSuggestionKey(email), suggestions.value.trim());
         });
 
-        savePass.addEventListener("click", async () => {
+        savePass.addEventListener("click", () => {
             const current = currentPass.value.trim();
             const next = newPass.value.trim();
             if (!current || !next) {
@@ -1625,21 +1629,22 @@
                 passMsg.textContent = "Senha fraca. Use 8+ caracteres, maiuscula, minuscula e numero.";
                 return;
             }
-            const user = auth.currentUser;
-            if (!user || !user.email) {
+            const email = getCurrentEmail();
+            if (!email) {
                 passMsg.textContent = "Sessao expirada. Faca login novamente.";
                 return;
             }
-            try {
-                const credential = EmailAuthProvider.credential(user.email, current);
-                await reauthenticateWithCredential(user, credential);
-                await updatePassword(user, next);
-                currentPass.value = "";
-                newPass.value = "";
-                passMsg.textContent = "Senha atualizada.";
-            } catch (err) {
-                passMsg.textContent = "Nao foi possivel atualizar. Verifique a senha atual.";
+            const users = getUsers();
+            const idx = users.findIndex((u) => u.email === email);
+            if (idx === -1 || users[idx].password !== current) {
+                passMsg.textContent = "Senha atual incorreta.";
+                return;
             }
+            users[idx].password = next;
+            saveUsers(users);
+            currentPass.value = "";
+            newPass.value = "";
+            passMsg.textContent = "Senha atualizada.";
         });
 
 
