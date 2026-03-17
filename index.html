@@ -743,6 +743,15 @@
             return `${token.slice(0, 3)}***${token.slice(-3)}`;
         }
 
+        function buildQuoteUrl(tickers, token) {
+            const isGithub = window.location.hostname.includes("github.io");
+            if (isGithub) {
+                const tickersPath = tickers.split(",").map((t) => t.trim()).filter(Boolean).join(",");
+                return `https://brapi.dev/api/quote/${encodeURIComponent(tickersPath)}?token=${encodeURIComponent(token)}`;
+            }
+            return `http://localhost:3000/api/quote?tickers=${encodeURIComponent(tickers)}&token=${encodeURIComponent(token)}`;
+        }
+
         function isStrongPassword(password) {
             return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password);
         }
@@ -1040,7 +1049,7 @@
             const tickers = [...new Set(investments.map((item) => item.ticker.toUpperCase()))];
             realStatus.textContent = "Atualizando cotacoes...";
             try {
-                const response = await fetch(`http://localhost:3000/api/quote?tickers=${tickers.join(",")}&token=${encodeURIComponent(token)}`);
+                const response = await fetch(buildQuoteUrl(tickers.join(","), token));
                 const data = await response.json();
                 if (!response.ok) {
                     const detail = data && (data.message || data.error || data.detail);
@@ -1348,7 +1357,7 @@
 
             realStatus.textContent = "Buscando preco atual...";
             try {
-                const response = await fetch(`http://localhost:3000/api/quote?tickers=${ticker}&token=${encodeURIComponent(token)}`);
+                const response = await fetch(buildQuoteUrl(ticker, token));
                 const data = await response.json();
                 const price = data && data.results && data.results[0] ? data.results[0].regularMarketPrice : null;
                 if (!price) {
