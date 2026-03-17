@@ -1050,14 +1050,15 @@
             realStatus.textContent = "Atualizando cotacoes...";
             try {
                 const response = await fetch(buildQuoteUrl(tickers.join(","), token));
-                const data = await response.json();
+                const data = await response.json().catch(() => null);
                 if (!response.ok) {
-                    const detail = data && (data.message || data.error || data.detail);
+                    const detail = data && (data.message || data.error || data.detail || data.code);
                     realStatus.textContent = detail ? `Erro: ${detail}` : "Erro ao buscar cotacoes.";
                     return;
                 }
-                if (!data || !data.results) {
-                    realStatus.textContent = "Resposta invalida da API.";
+                if (!data || data.error || !data.results) {
+                    const detail = data && (data.message || data.error || data.detail || data.code);
+                    realStatus.textContent = detail ? `Erro: ${detail}` : "Resposta invalida da API.";
                     return;
                 }
                 data.results.forEach((item) => {
@@ -1358,10 +1359,15 @@
             realStatus.textContent = "Buscando preco atual...";
             try {
                 const response = await fetch(buildQuoteUrl(ticker, token));
-                const data = await response.json();
+                const data = await response.json().catch(() => null);
                 if (!response.ok) {
-                    const detail = data && (data.message || data.error || data.detail);
+                    const detail = data && (data.message || data.error || data.detail || data.code);
                     realStatus.textContent = detail ? `Erro: ${detail}` : "Erro ao buscar cotacao.";
+                    return;
+                }
+                if (!data || data.error) {
+                    const detail = data && (data.message || data.error || data.detail || data.code);
+                    realStatus.textContent = detail ? `Erro: ${detail}` : "Resposta invalida da API.";
                     return;
                 }
                 const price = data && data.results && data.results[0] ? data.results[0].regularMarketPrice : null;
