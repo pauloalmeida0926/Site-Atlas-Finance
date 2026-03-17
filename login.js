@@ -1,3 +1,11 @@
+import { auth, setUserState } from "./auth.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
 const signupForm = document.getElementById("signup-form");
 const loginForm = document.getElementById("login-form");
 const resetForm = document.getElementById("reset-form");
@@ -12,22 +20,10 @@ const loginEmailInput = document.getElementById("login-email");
 const loginPasswordInput = document.getElementById("login-password");
 let pendingLoginEmail = "";
 
-function getUsers() {
-  const raw = localStorage.getItem("atlas_users");
-  return raw ? JSON.parse(raw) : [];
-}
-
-function saveUsers(users) {
-  localStorage.setItem("atlas_users", JSON.stringify(users));
-}
-
 function goToApp(email) {
   if (email) {
     localStorage.setItem("atlas_current_user", email.toLowerCase());
   }
-  localStorage.setItem("atlas_logged", "true");
-  const expires = Date.now() + (8 * 60 * 60 * 1000);
-  localStorage.setItem("atlas_session_expires", String(expires));
   window.location.href = "index.html";
 }
 
@@ -95,17 +91,22 @@ signupForm.addEventListener("submit", (event) => {
     signupMsg.className = "error";
     return;
   }
-  const users = getUsers();
-  if (users.some((u) => u.email === data.email)) {
-    signupMsg.textContent = "Email ja cadastrado. Use Entrar.";
-    signupMsg.className = "error";
-    return;
-  }
-  users.push({ ...data, verified: true });
-  saveUsers(users);
-  signupMsg.textContent = "Conta criada. Redirecionando...";
-  signupMsg.className = "success";
-  setTimeout(() => goToApp(data.email), 400);
+  createUserWithEmailAndPassword(auth, data.email, data.password)
+    .then(async (cred) => {
+      await updateProfile(cred.user, { displayName: data.name });
+      setUserState(cred.user);
+      signupMsg.textContent = "Conta criada. Redirecionando...";
+      signupMsg.className = "success";
+      setTimeout(() => goToApp(data.email), 400);
+    })
+    .catch((err) => {
+      if (err && err.code === "auth/email-already-in-use") {
+        signupMsg.textContent = "Email ja cadastrado. Use Entrar.";
+      } else {
+        signupMsg.textContent = "Erro ao criar conta. Tente novamente.";
+      }
+      signupMsg.className = "error";
+    });
 });
 
 loginForm.addEventListener("submit", (event) => {
@@ -117,16 +118,17 @@ loginForm.addEventListener("submit", (event) => {
     loginMsg.className = "error";
     return;
   }
-  const users = getUsers();
-  const user = users.find((u) => u.email === email && u.password === password);
-  if (!user) {
-    loginMsg.textContent = "Email ou senha invalidos.";
-    loginMsg.className = "error";
-    return;
-  }
-  loginMsg.textContent = "Login ok. Redirecionando...";
-  loginMsg.className = "success";
-  setTimeout(() => goToApp(email), 300);
+  signInWithEmailAndPassword(auth, email, password)
+    .then((cred) => {
+      setUserState(cred.user);
+      loginMsg.textContent = "Login ok. Redirecionando...";
+      loginMsg.className = "success";
+      setTimeout(() => goToApp(email), 300);
+    })
+    .catch(() => {
+      loginMsg.textContent = "Email ou senha invalidos.";
+      loginMsg.className = "error";
+    });
 });
 
 forgotBtn.addEventListener("click", () => {
@@ -140,8 +142,21 @@ resetBack.addEventListener("click", () => {
 
 resetForm.addEventListener("submit", (event) => {
   event.preventDefault();
-  resetMsg.textContent = "Redefinicao por email desativada no momento.";
-  resetMsg.className = "error";
+  const email = resetForm["reset-email"] ? resetForm["reset-email"].value.trim().toLowerCase() : "";
+  if (!email) {
+    resetMsg.textContent = "Preencha o email.";
+    resetMsg.className = "error";
+    return;
+  }
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      resetMsg.textContent = "Email de redefinicao enviado. Verifique sua caixa de entrada.";
+      resetMsg.className = "success";
+    })
+    .catch(() => {
+      resetMsg.textContent = "Nao foi possivel enviar o email.";
+      resetMsg.className = "error";
+    });
 });
 
 document.addEventListener("click", (event) => {

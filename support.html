@@ -157,13 +157,9 @@
         </section>
     </main>
 
-    <script>
-        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
-        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
-            localStorage.removeItem("atlas_logged");
-            localStorage.removeItem("atlas_session_expires");
-            window.location.href = "login.html";
-        }
+    <script type="module">
+        import { requireAuth, signOutUser } from "./auth.js";
+        requireAuth();
 
         const chatMessages = document.getElementById("chat-messages");
         const chatOptions = document.getElementById("chat-options");
@@ -264,8 +260,7 @@
         renderChat("start");
 
         logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("atlas_logged");
-            window.location.href = "login.html";
+            signOutUser();
         });
     </script>
 </body>

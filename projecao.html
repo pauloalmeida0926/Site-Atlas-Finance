@@ -190,13 +190,9 @@
             </div>
         </section>
     </main>
-    <script>
-        const sessionExpires = Number(localStorage.getItem("atlas_session_expires") || "0");
-        if (localStorage.getItem("atlas_logged") !== "true" || (sessionExpires && Date.now() > sessionExpires)) {
-            localStorage.removeItem("atlas_logged");
-            localStorage.removeItem("atlas_session_expires");
-            window.location.href = "login.html";
-        }
+    <script type="module">
+        import { requireAuth, signOutUser } from "./auth.js";
+        requireAuth();
 
         const form = document.getElementById("proj-form");
         const result = document.getElementById("proj-result");
@@ -301,8 +297,7 @@
         classSelect.addEventListener("change", toggleFields);
 
         logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("atlas_logged");
-            window.location.href = "login.html";
+            signOutUser();
         });
     </script>
 </body>

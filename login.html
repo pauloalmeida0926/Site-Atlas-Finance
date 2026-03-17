@@ -200,13 +200,17 @@
         </form>
 
         <form id="reset-form" style="display:none;" novalidate>
-            <div class="hint">Redefinicao por email temporariamente desativada.</div>
-            <button id="reset-back" class="link-btn" type="button">Voltar ao login</button>
+            <div>
+                <label for="reset-email">Email</label>
+                <input id="reset-email" name="reset-email" type="email" required />
+            </div>
+            <button type="submit">Enviar email de redefinicao</button>
             <div id="reset-msg" class="muted"></div>
+            <button id="reset-back" class="link-btn" type="button">Voltar ao login</button>
         </form>
     </div>
     <div id="click-debug">JS carregando…</div>
 
-    <script src="login.js" defer></script>
+    <script type="module" src="login.js" defer></script>
 </body>
 </html>
